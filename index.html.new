@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBSIDIA — Studio المراجعات السينمائية v7.0</title>
+  <meta name="description" content="OBSIDIA: ستوديو داكن أنيق على طريقة Apple TV لصناعة مراجعات الأفلام بالدارجة — بحث، تقييم، تحليل، صياغة، وتصدير فـ مسار واحد واضح." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            lx: { bg: '#0a0b10', card: '#14161f', surface: '#1c1f2b', border: '#2b2f3f', text: '#aeb4c4', light: '#f2f3f7', gold: '#e2b567', blue: '#5eaef9', green: '#3fd6a4', red: '#ff5a6e' }
+          },
+          fontFamily: { sans: ['Alexandria', 'Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen film-grain pb-28 selection:bg-lx-gold selection:text-black">
+
+  <!-- ═══ AMBIANCE LAYERS (decoratif only) ═══ -->
+  <div id="ambientBackdrop" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');"></div>
+  <div id="ambientOverlay"></div>
+  <div id="projectorBeam" aria-hidden="true"></div>
+
+  <!-- ═══ HEADER — Apple-TV style: blur, minimal, monochrome + gold ═══ -->
+  <header class="obs-header sticky top-0 z-50">
+    <!-- Progress bar de complétion du parcours -->
+    <div id="wizardProgressBar" class="obs-progress" style="width:0%"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="obs-logo" title="OBSIDIA" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="32" height="32">
+            <defs>
+              <linearGradient id="obsGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#e2b567"/>
+                <stop offset="100%" stop-color="#f6e3b4"/>
+              </linearGradient>
+            </defs>
+            <polygon points="20,3 34,11.5 34,28.5 20,37 6,28.5 6,11.5" fill="none" stroke="url(#obsGrad)" stroke-width="2.2"/>
+            <circle cx="20" cy="20" r="6.5" fill="none" stroke="url(#obsGrad)" stroke-width="2.2"/>
+            <circle cx="20" cy="20" r="2.2" fill="#e2b567"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="brand-word text-xl sm:text-2xl">OBSIDIA<span class="brand-dot">.</span></h1>
+            <span class="obs-ver-chip">v7.0 Studio</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">مسار واحد واضح: قلب على الفيلم ← قيّم ← حلّل ← صياغ ← صدّر</p>
+        </div>
+      </div>
+
+      <!-- Top actions -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="toggleModal('apiModal')" class="obs-btn-pill flex items-center gap-2">
+          <span>🔑</span><span>مفاتيح الـ API</span>
+          <span id="apiStatusBadge" class="w-2.5 h-2.5 rounded-full bg-lx-red"></span>
+        </button>
+        <button onclick="toggleModal('dnaModal')" class="obs-btn-pill flex items-center gap-2 obs-btn-dna">
+          <span>🧬</span><span>بصمتي السينمائية</span>
+        </button>
+        <button onclick="downloadFullProjectZip()" class="obs-btn-pill flex items-center gap-2 obs-btn-gold">
+          <span>📦</span><span>تحميل دوسي (.ZIP)</span>
+        </button>
+        <button onclick="confirmReset()" title="إفراغ الاستمارة للبدء من الصفر" class="obs-btn-pill flex items-center gap-2 obs-btn-danger">
+          <span>🔄</span><span>تصفير</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
+
+  <!-- ═══ PARCOURS — 5 étapes (structure propre, une seule source de logique) ═══ -->
+  <nav id="wizardNav" aria-label="مراحل صناعة المراجعة" class="obs-steps-bar cinema-glass rounded-2xl px-3 py-3 sm:px-5">
+    <ol class="obs-steps">
+      <li><button type="button" onclick="goToStep(1)" data-step-btn="1" class="wiz-step is-active"><span class="wiz-num">1</span><span class="wiz-txt"><b>قلب على فيلم</b><small>بحث · RSS · CSV</small></span></button></li>
+      <li><button type="button" onclick="goToStep(2)" data-step-btn="2" class="wiz-step"><span class="wiz-num">2</span><span class="wiz-txt"><b>قيّم</b><small>نجمات · سياق</small></span></button></li>
+      <li><button type="button" onclick="goToStep(3)" data-step-btn="3" class="wiz-step"><span class="wiz-num">3</span><span class="wiz-txt"><b>حلّل</b><small>عناصر · Vibe</small></span></button></li>
+      <li><button type="button" onclick="goToStep(4)" data-step-btn="4" class="wiz-step"><span class="wiz-num">4</span><span class="wiz-txt"><b>اضبط</b><small>نبرة · لغة · AI</small></span></button></li>
+      <li><button type="button" onclick="goToStep(5)" data-step-btn="5" class="wiz-step"><span class="wiz-num">5</span><span class="wiz-txt"><b>صياغ وصدّر</b><small>نسخ · أرشيف · ZIP</small></span></button></li>
+    </ol>
+    <div class="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+      <div class="text-[11px] text-slate-400 font-mono" id="wizardHint">▶ المرحلة 1 من 5 — قلب أولًا على الفيلم</div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="prevStep()" class="obs-nav-btn">→ السابق</button>
+        <button onclick="nextStep()" class="obs-nav-btn obs-nav-next">التالي ←</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════ PHASE 1 — الاكتشاف ══════════════ -->
+  <section class="wiz-panel" data-step="1" aria-label="المرحلة 1: البحث عن فيلم">
+
+    <!-- HERO SHOWCASE — Netflix-style billboard -->
+    <section id="heroShowcase" class="obs-billboard relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl min-h-[340px] sm:min-h-[380px] flex flex-col justify-end" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&amp;w=1920&amp;auto=format&amp;fit=crop');">
+      <div class="hero-vignette absolute inset-0"></div>
+
+      <div class="relative z-10 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-2 mb-auto">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="heroSourceBadge" class="obs-chip">🎬 Ready for Film Selection</span>
+          <span id="fanartStatusPill" class="obs-chip obs-chip-purple hidden">✨ Fanart.tv HD Active</span>
+        </div>
+        <button onclick="openFanartDrawer()" class="obs-chip obs-chip-btn">
+          <span>🖼️</span><span>معرض الخلفيات</span>
+          <span id="fanartCountBadge" class="obs-count">0</span>
+        </button>
+      </div>
+
+      <div class="relative z-10 p-5 sm:p-8 pt-0 flex flex-col sm:flex-row items-center sm:items-end gap-6">
+        <!-- Poster -->
+        <div class="relative group shrink-0">
+          <div class="obs-poster w-32 sm:w-40 aspect-[2/3] rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-lx-card flex items-center justify-center">
+            <img id="heroPosterImg" src="" alt="Film Poster" class="w-full h-full object-cover hidden">
+            <div id="heroPosterPlaceholder" class="text-center p-4">
+              <span class="text-4xl block mb-2">🎞️</span>
+              <span class="text-[11px] text-slate-400 block">اختار فيلم من البحث أولا كتب سميتو</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Title + metadata -->
+        <div class="flex-1 w-full text-center sm:text-right space-y-3">
+          <div id="clearLogoContainer" class="hidden mb-2">
+            <img id="heroClearLogo" src="" alt="Movie ClearLogo" class="max-h-20 sm:max-h-24 object-contain mx-auto sm:mx-0 drop-shadow-[0_10px_15px_rgba(0,0,0,0.9)]">
+          </div>
+          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <span id="heroGenreText" class="obs-chip">بلا تصنيف حالياً</span>
+            <span id="heroIdsText" class="text-[11px] font-mono text-slate-400"></span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
+            <div class="sm:col-span-6">
+              <label class="obs-label" for="filmTitle">سمية الفيلم *</label>
+              <input id="filmTitle" type="text" placeholder="مثال: A Clockwork Orange / La Haine..." oninput="syncHeroDisplay()" class="obs-input obs-input-strong w-full">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="obs-label" for="filmYear">العام</label>
+              <input id="filmYear" type="number" placeholder="1971" oninput="syncHeroDisplay()" class="obs-input obs-input-strong w-full text-center font-mono">
+            </div>
+            <div class="sm:col-span-4">
+              <label class="obs-label" for="filmDirector">المخرج</label>
+              <input id="filmDirector" type="text" placeholder="Stanley Kubrick" oninput="syncHeroDisplay()" class="obs-input obs-input-strong w-full">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fanart drawer -->
+      <div id="fanartDrawer" class="hidden relative z-10 border-t border-white/10 bg-black/85 backdrop-blur-xl p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div>
+            <h4 class="text-xs font-bold text-white flex items-center gap-2"><span>🎨 معرض الخلفيات واللوغويات (Fanart.tv &amp; TMDB)</span></h4>
+            <p class="text-[11px] text-slate-400">كليكي على أي خلفية باش تطبقها على التطبيق، أولا حط رابط صورة من اختيارك.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="customBackdropInput" type="url" placeholder="رابط صورة خلفية (URL)..." class="obs-input obs-input-sm w-56">
+            <button onclick="applyCustomBackdrop()" class="obs-btn-solid-gold text-xs">تطبيق</button>
+          </div>
+        </div>
+        <div id="fanartGalleryGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-48 overflow-y-auto p-1">
+          <div class="col-span-full text-center py-4 text-xs text-slate-400">قلب على شي فيلم واختارو باش يبانو ليك الخلفيات بجودة عالية هنا!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SMART SEARCH HUB -->
+    <section class="cinema-glass rounded-3xl p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5 border-b border-white/10 pb-4">
+        <div class="flex items-center gap-2.5">
+          <span class="obs-phase-badge">1</span>
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold text-white">مركز البحث والمزامنة الذكي</h2>
+            <p class="text-xs text-slate-400">قلب على أي فيلم باش يجبد البوستر، المخرج، والخلفيات أوتوماتيكياً</p>
+          </div>
+        </div>
+        <div class="obs-tabs" role="tablist">
+          <button onclick="switchHubTab('search')" id="hubTab-search" class="obs-tab is-on" role="tab">🔍 بحث عالمي</button>
+          <button onclick="switchHubTab('rss')" id="hubTab-rss" class="obs-tab" role="tab">🟠 حسابي (RSS)</button>
+          <button onclick="switchHubTab('csv')" id="hubTab-csv" class="obs-tab" role="tab">📂 ملفاتي (CSV)</button>
+        </div>
+      </div>
+
+      <div id="hubPanel-search" class="space-y-4">
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <input id="globalSearchInput" type="text" placeholder="كتب سمية الفيلم بـ الإنگليزية أو الفرنسية (مثلاً: Blade Runner 2049, Incendies)..." onkeydown="if(event.key==='Enter') runGlobalSearch()" class="obs-input flex-1 !py-3 text-sm">
+          <button onclick="runGlobalSearch()" id="searchBtn" class="obs-btn-solid-gold shrink-0 !px-6 !py-3 text-sm">🔍 قلّب وجبد الخلفيات</button>
+        </div>
+        <div id="searchStatusMsg" class="text-xs text-slate-400 hidden"></div>
+        <div id="searchResultsGrid" class="obs-poster-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 empty:hidden pt-1"></div>
+      </div>
+
+      <div id="hubPanel-rss" class="hidden space-y-4">
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <input id="rssUsernameInput" type="text" placeholder="كتب الـ Username ديالك فـ Letterboxd (مثلاً: davidehrlich)..." onkeydown="if(event.key==='Enter') fetchLetterboxdRSS()" class="obs-input flex-1 !py-3 text-sm">
+          <button onclick="fetchLetterboxdRSS()" class="obs-btn-solid-blue shrink-0 !px-6 !py-3 text-sm">🟠 جبد آخر أفلامي</button>
+        </div>
+        <p class="text-[11px] text-slate-400">كيقرأ آخر أفلام Diary ديالك مع النجمات، العام، والمراجعات القديمة.</p>
+        <div id="rssStatusMsg" class="text-xs text-slate-400 hidden"></div>
+        <div id="rssResultsGrid" class="obs-poster-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 empty:hidden pt-1"></div>
+      </div>
+
+      <div id="hubPanel-csv" class="hidden space-y-4">
+        <div class="obs-dropzone">
+          <input type="file" id="csvFileInput" accept=".csv" multiple onchange="handleCSVUpload(event)" class="hidden">
+          <label for="csvFileInput" class="cursor-pointer block space-y-2">
+            <span class="text-3xl block">📂</span>
+            <span class="text-sm font-bold text-white block">كليكي هنا باش ترفع ملفات Letterboxd CSV ديالك</span>
+            <span class="text-xs text-slate-400 block">كلشي كيتقرأ 100% أوفلاين — وتقدر تستورد المراجعات القديمة لـ Writing DNA!</span>
+          </label>
+        </div>
+        <div id="csvFilterBar" class="hidden flex flex-wrap items-center gap-2">
+          <input id="csvSearchInput" type="text" placeholder="فلتر أفلامك بالسمية..." oninput="renderCSVItems()" class="obs-input obs-input-sm flex-1">
+          <select id="csvStarFilter" onchange="renderCSVItems()" class="obs-input obs-input-sm">
+            <option value="all">كل التقييمات</option>
+            <option value="5">★★★★★ (5)</option>
+            <option value="4.5">★★★★½ (4.5)</option>
+            <option value="4">★★★★ (4)</option>
+            <option value="3.5">★★★½ (3.5)</option>
+            <option value="3">★★★ (3 أو أقل)</option>
+          </select>
+        </div>
+        <div id="csvResultsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-72 overflow-y-auto empty:hidden"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ══════════════ WORKSPACE GRID (phases 2 → 5) ══════════════ -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- Colonne principale (7/12) : Phases 2 et 3 -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- PHASE 2 — التقييم -->
+      <section class="wiz-panel hidden" data-step="2" aria-label="المرحلة 2: التقييم">
+        <div class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-5">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="obs-phase-badge">2</span>
+              <div>
+                <h2 class="text-base sm:text-lg font-extrabold text-white">التقييم وسياق المشاهدة</h2>
+                <p class="text-xs text-slate-400">الاختيارات كتبدا محايدة — عمّر غير اللي بغيتي</p>
+              </div>
+            </div>
+            <span id="ratingBadgeDisplay" class="obs-rating-badge">مازال ما مقيمش (Unrated)</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-300">شحال عطيتيه من نجمة؟ (اختياري)</label>
+              <button onclick="setRating(null)" class="text-[11px] text-slate-400 hover:text-white underline">بلا نجمات</button>
+            </div>
+            <div class="grid grid-cols-5 sm:grid-cols-10 gap-1.5" id="starButtonsGrid"></div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
+              <button id="likeToggleBtn" onclick="toggleLiked()" class="pill-btn flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-black/40 border border-white/15 text-xs font-bold text-slate-300">
+                <span id="likeIcon">🤍</span>
+                <span id="likeText">Liked (قليب فـ Letterboxd)</span>
+              </button>
+              <select id="watchTypeSelect" class="obs-input text-xs font-semibold">
+                <option value="">🎬 واش أول مرة شفتيه؟ (اختياري)</option>
+                <option value="First-time watch">أول مرة كنتفرج فيه (First Watch)</option>
+                <option value="Rewatch">معاودو (Rewatch 🔄)</option>
+              </select>
+              <select id="expectationSelect" class="obs-input text-xs font-semibold">
+                <option value="">🎯 كيف جاك مقارنة بالتوقعات؟ (اختياري)</option>
+                <option value="Exceeded all expectations">فاق التوقعات ديالي بزاف 🔥</option>
+                <option value="Met expectations">على قد التوقعات تماماً 👌</option>
+                <option value="Slightly underwhelming">توقعت منو كثر شوية 😕</option>
+                <option value="Complete disappointment">صدمة وخيب ظني بزاف 💔</option>
+                <option value="Went in completely blind">دخلت ليه بلا ما نعرف عليه والو 👀</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 3 — التحليل -->
+      <section class="wiz-panel hidden" data-step="3" aria-label="المرحلة 3: التحليل">
+        <div class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="obs-phase-badge">3</span>
+              <div>
+                <h2 class="text-base sm:text-lg font-extrabold text-white">التحليل السينمائي المفصل</h2>
+                <p class="text-xs text-slate-400">قيّم غير العناصر اللي بغيتي تهضر عليها، وخلي الباقي "ما عنديش رأي"</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="bulkSetElements('Masterclass 🔥')" class="obs-mini-btn obs-mini-green">كلشي أسطوري 🔥</button>
+              <button onclick="bulkSetElements('')" class="obs-mini-btn">تصفير العناصر</button>
+            </div>
+          </div>
+          <div id="elementsMatrixContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        </div>
+
+        <div class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-5 mt-6">
+          <div class="flex items-center gap-2.5 border-b border-white/10 pb-3">
+            <span class="obs-phase-badge">3</span>
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">الـ Vibe واللمسة الشخصية ديالك</h2>
+              <p class="text-xs text-slate-400">هاد التفاصيل هي اللي كتخلي المراجعة خارجة من قلبك</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-2">الإحساس اللي خلا فيك الفيلم (اختار اللي بغيتي):</label>
+            <div id="vibeChipsContainer" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-emerald-300 mb-1">✨ أقوى نقطة أولا مشهد بقى فـ بالك:</label>
+              <textarea id="bestMomentInput" rows="2" placeholder="مثلاً: مشهد النهاية، أو الموسيقى فاش البطل كان كيجري..." class="obs-input text-xs"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-rose-300 mb-1">⚡ شي حاجة ما عجباتكش أو نقصات من الفيلم:</label>
+              <textarea id="weakPointInput" rows="2" placeholder="مثلاً: النص التاني كان ثقيل شوية، أو النهاية دازت بالزربة..." class="obs-input text-xs"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-200 mb-1">💭 فكرة حرة، تشبيه، أو إحساس بالدارجة (الـ AI غادي يصيغو بأسلوبك):</label>
+            <textarea id="freeThoughtsInput" rows="2" placeholder="كتب أي فكرة جاتك على الفيلم واخا تكون غير مخربقة بالدارجة..." class="obs-input text-xs"></textarea>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Colonne latérale (5/12) : Phases 4 et 5 -->
+    <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+
+      <!-- PHASE 4 — الضبط -->
+      <section class="wiz-panel hidden" data-step="4" aria-label="المرحلة 4: إعدادات الأسلوب">
+        <div class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+              <span class="obs-phase-badge">4</span>
+              <span>🎛️ إعدادات الأسلوب والنبرة</span>
+            </h2>
+            <select id="stylePresetSelect" onchange="applyStylePreset(this.value)" class="obs-input obs-input-sm !text-lx-gold w-auto">
+              <option value="balanced">⚡ متوازن وطبيعي</option>
+              <option value="punchy">⚡ Letterboxd Witty</option>
+              <option value="cinephile">⚡ نقد سينمائي عميق</option>
+              <option value="raw">⚡ صريح ومباشر</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="obs-label" for="reviewLang">لغة المراجعة</label>
+              <select id="reviewLang" class="obs-input text-xs font-bold w-full">
+                <option value="English">🇬🇧 English</option>
+                <option value="Moroccan Darija (Arabic Script)">🇲🇦 الدارجة المغربية</option>
+                <option value="French">🇫🇷 Français</option>
+                <option value="Modern Standard Arabic">🇸🇦 الفصحى</option>
+              </select>
+            </div>
+            <div>
+              <label class="obs-label" for="reviewLength">الطول</label>
+              <select id="reviewLength" class="obs-input text-xs font-bold w-full">
+                <option value="Medium &amp; Balanced (1-2 tight paragraphs, ~90-140 words)">متوسطة (فقرة لـ 2)</option>
+                <option value="Short &amp; Punchy Letterboxd style (1-3 sharp sentences)">قصيرة ومضروبة</option>
+                <option value="In-depth Analytical Review (3 structured paragraphs)">مفصلة وتحليلية (3 فقرات)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="obs-label" for="spoilerPolicy">سياسة الحرق</label>
+              <select id="spoilerPolicy" class="obs-input text-xs font-bold w-full">
+                <option value="STRICT NO SPOILERS (Do not reveal plot twists or ending details)">🚫 بلا حرق نهائياً</option>
+                <option value="Light thematic discussion allowed, keep major twists hidden">⚠️ نقاش خفيف بلا نهاية</option>
+                <option value="Full Spoilers Allowed (Include [Contains Spoilers] tag at top)">🔥 بالحرق الكامل</option>
+              </select>
+            </div>
+            <div>
+              <label class="obs-label" for="reviewTone">النبرة العامة</label>
+              <select id="reviewTone" class="obs-input text-xs font-bold w-full">
+                <option value="Authentic, grounded human film lover">طبيعي وحقيقي</option>
+                <option value="Sharp, witty, slightly ironic Letterboxd regular">ذكي وفيه سخرية</option>
+                <option value="Passionate, observant cinephile focused on craft">عاشق للتفاصيل</option>
+                <option value="Poetic, atmospheric, and emotionally reflective">شاعري وعميق</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-black/40 rounded-2xl p-3.5 border border-white/10 space-y-2.5">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-300 font-semibold">😂 الفكاهة والسخرية:</span>
+              <span id="humorVal" class="font-mono text-lx-red">3/10</span>
+            </div>
+            <input id="humorSlider" type="range" min="0" max="10" value="3" oninput="document.getElementById('humorVal').textContent=this.value+'/10'" class="w-full accent-lx-red h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            <div class="flex items-center justify-between text-[11px] pt-1">
+              <span class="text-slate-300 font-semibold">🧠 العمق النقدي:</span>
+              <span id="depthVal" class="font-mono text-lx-gold">7/10</span>
+            </div>
+            <input id="depthSlider" type="range" min="0" max="10" value="7" oninput="document.getElementById('depthVal').textContent=this.value+'/10'" class="w-full accent-lx-gold h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+          </div>
+
+          <div class="flex flex-col gap-2 pt-1 text-xs">
+            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+              <input id="antiAiToggle" type="checkbox" checked class="accent-lx-gold w-4 h-4 rounded">
+              <span>🛡️ <strong>Anti-Generic Filter:</strong> منع المقدمات المبتذلة والكلمات المصطنعة</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+              <input id="strictFactToggle" type="checkbox" checked class="accent-lx-gold w-4 h-4 rounded">
+              <span>🔒 <strong>Fact Guard:</strong> منع اختراع أي مشهد أو رأي ما كتبتوش أنا</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 5 — الصياغة والتصدير -->
+      <section class="wiz-panel hidden" data-step="5" aria-label="المرحلة 5: التوليد والتصدير">
+        <div class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4 obs-border-top-accent">
+          <div class="flex items-center gap-2.5 border-b border-white/10 pb-3">
+            <span class="obs-phase-badge">5</span>
+            <div>
+              <h2 class="text-base font-black text-white">🚀 توليد المراجعة أو نسخ البرومبت</h2>
+              <p class="text-[11px] text-slate-400">ولّد 3 نسخ وعدّل عليهم هنا، أو انسخ الـ Master Prompt لأي شات!</p>
+            </div>
+          </div>
+
+          <div id="validationWarningBox" class="hidden rounded-xl bg-amber-500/15 border border-amber-500/40 p-3 text-xs text-amber-200 space-y-1"></div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button onclick="generatePromptAndCopy()" class="obs-btn-solid-gold flex items-center justify-center gap-2 !py-3 text-xs sm:text-sm">
+              <span>📋</span><span>نسخ البرومبت الاحترافي</span>
+            </button>
+            <button onclick="generateReviewsInApp()" id="inAppGenBtn" class="obs-btn-solid-blue flex items-center justify-center gap-2 !py-3 text-xs sm:text-sm">
+              <span>✨</span><span>توليد 3 مراجعات وسط التطبيق</span>
+            </button>
+          </div>
+
+          <details class="group bg-black/50 rounded-2xl border border-white/10 overflow-hidden">
+            <summary class="cursor-pointer px-4 py-2.5 text-xs font-bold text-slate-300 flex items-center justify-between hover:text-white">
+              <span>👁️ معاينة الـ Master Prompt (مع بصمتك Writing DNA)</span>
+              <span class="text-[10px] font-mono text-lx-gold transition">▼</span>
+            </summary>
+            <div class="p-3 border-t border-white/10">
+              <textarea id="promptOutputArea" readonly rows="8" class="w-full bg-black/80 text-slate-200 font-mono text-[11px] p-3 rounded-xl border border-white/10 focus:outline-none"></textarea>
+            </div>
+          </details>
+
+          <div id="aiStudioResultsArea" class="hidden space-y-4 pt-2 border-t border-white/10">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-black uppercase tracking-wider text-lx-gold">✨ النسخ المقترحة (Compare &amp; Copy)</h3>
+              <span id="aiGenStatus" class="text-[11px] text-slate-400"></span>
+            </div>
+            <div id="variationsContainer" class="space-y-3"></div>
+            <div class="bg-black/50 rounded-2xl p-3.5 border border-white/10 space-y-2.5">
+              <label class="block text-xs font-bold text-white">🛠️ بغيتي تعدّل النسخة اللي عجباتك؟</label>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="refineReview('Make it shorter and punchier, remove any fluff')" class="obs-mini-btn">✂️ نقص منها</button>
+                <button onclick="refineReview('Make the tone more personal and conversational')" class="obs-mini-btn">💬 خليها شخصية</button>
+                <button onclick="refineReview('Add slightly sharper critical edge')" class="obs-mini-btn">🎯 زيد النقد</button>
+                <button onclick="refineReview('Remove the opening sentence and jump straight into the point')" class="obs-mini-btn">🚀 حيد المقدمة</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
+            <button onclick="saveCurrentToJournal()" class="text-lx-gold hover:underline font-bold flex items-center gap-1">
+              <span>💾</span><span>حفظ فـ الأرشيف ديالي</span>
+            </button>
+            <button onclick="toggleModal('journalModal')" class="text-slate-300 hover:text-white font-semibold">
+              📚 أرشيفي (<span id="journalCount">0</span>)
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- ═══ MODALS ═══ -->
+<div id="apiModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div class="cinema-glass rounded-3xl max-w-xl w-full p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🔑</span>
+        <div>
+          <h3 class="text-lg font-black text-white">إعدادات مفاتيح الـ API</h3>
+          <p class="text-xs text-slate-400">حط المفاتيح هنا أولا وسط <code class="text-lx-gold font-mono">js/config.js</code> ملي تيليشارجي الدوسي!</p>
+        </div>
+      </div>
+      <button onclick="toggleModal('apiModal')" class="text-slate-400 hover:text-white text-xl font-bold">✕</button>
+    </div>
+    <div class="space-y-4 text-xs">
+      <div class="p-3 rounded-xl bg-lx-gold/10 border border-lx-gold/30 text-slate-200 leading-relaxed">
+        💡 التطبيق كيخدم <strong>حتى بلا هاد المفاتيح</strong> (iTunes API + Wikidata + CORS Proxy)، ولكن مفتاح <strong>TMDB</strong> و <strong>Fanart.tv</strong> كيعطي خلفيات 4K و ClearLogos بدقة 100%!
+      </div>
+      <div>
+        <label class="block font-bold text-white mb-1">1. مفتاح Fanart.tv (الخلفيات والـ ClearLogos):</label>
+        <input id="cfgFanartKey" type="password" placeholder="Personal/Project API Key..." class="obs-input obs-input-mono w-full">
+        <p class="text-[11px] text-slate-400 mt-1">مجاناً من: <a href="https://fanart.tv/get-an-api-key/" target="_blank" rel="noopener noreferrer" class="text-lx-gold underline">fanart.tv/get-an-api-key</a></p>
+      </div>
+      <div>
+        <label class="block font-bold text-white mb-1">2. مفتاح TMDB API v3 (البحث والبوسترات):</label>
+        <input id="cfgTmdbKey" type="password" placeholder="TMDB API Key..." class="obs-input obs-input-mono w-full">
+        <p class="text-[11px] text-slate-400 mt-1">مجاناً من: <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" class="text-lx-gold underline">themoviedb.org/settings/api</a></p>
+      </div>
+      <div>
+        <label class="block font-bold text-white mb-1">3. مفتاح OMDb (اختياري — معلومات IMDb):</label>
+        <input id="cfgOmdbKey" type="password" placeholder="OMDb Key..." class="obs-input obs-input-mono w-full">
+      </div>
+      <div>
+        <label class="block font-bold text-white mb-1">4. مفتاح Gemini (اختياري — توليد داخل التطبيق):</label>
+        <input id="cfgGeminiKey" type="password" placeholder="AIzaSy... (يُحفظ فـ المتصفح فقط)" class="obs-input obs-input-mono w-full">
+        <p class="text-[11px] text-slate-400 mt-1">بلا هاد المفتاح، التطبيق غادي يخرج ليك 3 قوالب ذكية واجدة للتعديل!</p>
+      </div>
+      <div class="flex items-center justify-between pt-2">
+        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+          <input type="checkbox" onchange="togglePasswordVisibility(this.checked)" class="accent-lx-gold">
+          <span>إظهار المفاتيح</span>
+        </label>
+        <div class="flex gap-2">
+          <button onclick="clearApiKeys()" class="obs-btn-outline-danger">مسح المفاتيح</button>
+          <button onclick="saveApiKeysFromModal()" class="obs-btn-solid-gold">حفظ وتفعيل ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dnaModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div class="cinema-glass rounded-3xl max-w-2xl w-full p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🧬</span>
+        <div>
+          <h3 class="text-lg font-black text-white">بصمتي السينمائية وأسلوبي (Writing DNA)</h3>
+          <p class="text-xs text-slate-400">عمّرها مرة وحدة، وغادي تدخل أوتوماتيكياً فـ كل برومبت باش الـ AI يكتب بحالك!</p>
+        </div>
+      </div>
+      <button onclick="toggleModal('dnaModal')" class="text-slate-400 hover:text-white text-xl font-bold">✕</button>
+    </div>
+    <div class="space-y-4 text-xs">
+      <div>
+        <label class="block font-bold text-slate-200 mb-1">🏆 أفلامي الـ 4 المفضلة (Top 4 Favorites):</label>
+        <input id="dnaFavFilms" type="text" placeholder="مثلاً: A Clockwork Orange, Goodfellas, La Haine, Seven..." class="obs-input w-full">
+      </div>
+      <div>
+        <label class="block font-bold text-slate-200 mb-1">🔍 شنو أكثر حاجة كتركز عليها فاش كتفرج؟:</label>
+        <input id="dnaCriticalFocus" type="text" placeholder="مثلاً: الإخراج، التصوير، الموسيقى، والأثر النفسي ديال الشخصيات..." class="obs-input w-full">
+      </div>
+      <div>
+        <label class="block font-bold text-slate-200 mb-1">✍️ عينات من مراجعاتي القديمة (باش يقلّد ستيلك):</label>
+        <textarea id="dnaSamples" rows="4" placeholder="حط جوج أولا 3 ديال المراجعات صغار فايت كاتبهم، أولا استوردهم من CSV..." class="obs-input w-full"></textarea>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-200 mb-1">🚫 كلمات أو أساليب ما بغيتيهاش تبان فـ مراجعاتك:</label>
+        <input id="dnaAvoidWords" type="text" placeholder="مثلاً: ما تكتبش مقدمات طويلة، ما تلخصش القصة..." class="obs-input w-full">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="saveWritingDNA()" class="obs-btn-solid-gold">حفظ البصمة السينمائية 🧬</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="journalModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div class="cinema-glass rounded-3xl max-w-2xl w-full p-6 space-y-4 border border-white/15 max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-lg font-black text-white">📚 أرشيفي ومسودات المراجعات</h3>
+      <button onclick="toggleModal('journalModal')" class="text-slate-400 hover:text-white text-xl font-bold">✕</button>
+    </div>
+    <div id="journalListContainer" class="space-y-2.5 text-xs"></div>
+  </div>
+</div>
+
+<div id="toastBox" class="fixed bottom-5 left-5 z-50 px-5 py-3 rounded-2xl font-black text-xs shadow-2xl transition-all bg-lx-gold text-black hidden"></div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

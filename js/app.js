@@ -76,12 +76,24 @@
       renderJournalCount();
       updateMasterPromptPreview();
       initDesignEnhancements();
-      initCinematikWizard();
+      initObsidiaParcours();
     });
 
+    /* Exposer les fonctions globales pour onclick inline + exports module (robustesse) */
+    const OBSIDIA_API = {
+      goToStep, nextStep, prevStep, switchHubTab, runGlobalSearch, fetchLetterboxdRSS,
+      handleCSVUpload, renderCSVItems, applyCustomBackdrop, openFanartDrawer, setRating,
+      toggleLiked, bulkSetElements, toggleModal, saveApiKeysFromModal, clearApiKeys,
+      togglePasswordVisibility, saveWritingDNA, applyStylePreset, generatePromptAndCopy,
+      generateReviewsInApp, refineReview, saveCurrentToJournal, confirmReset,
+      downloadFullProjectZip, syncHeroDisplay
+    };
+    Object.assign(window, OBSIDIA_API);
+    if (typeof module !== "undefined" && module.exports) module.exports = OBSIDIA_API;
+
     /* ══════════════════════════════════════════════════════════════
-       CINÉMATIK WIZARD — 5 phases façon Netflix / Apple TV
-       (vissage visuel : ما كيبدل والو فـ الـ logic ولا الـ IDs)
+       OBSIDIA PARCOURS — 5 phases (style Apple TV / Netflix)
+       Source unique de logique : navigation + progression + indices.
        ══════════════════════════════════════════════════════════════ */
     let wizCurrentStep = 1;
     const WIZ_TOTAL_STEPS = 5;
@@ -90,7 +102,7 @@
       2: "▶ المرحلة 2 من 5 — عطي النجمات ديالك وحدد سياق المشاهدة (كلشي اختياري ومحايد بالبداية)",
       3: "▶ المرحلة 3 من 5 — حلّل العناصر اللي عاجباك، وضيف tags الـ Vibe والفكرة الحرة ديالك",
       4: "▶ المرحلة 4 من 5 — اضبط النبرة، الطول، اللغة، والـ Sliders ديال الـ AI",
-      5: "▶ المرحلة 5 من 5 — ولّد المراجعة، عدّل النسخ، وصدّر كلشي (Markdown · ZIP)"
+      5: "▶ المرحلة 5 من 5 — ولّد المراجعة، عدّل النسخ، وصدّر كلشي (نسخ · أرشيف · ZIP)"
     };
 
     function isPhaseComplete(step) {
@@ -124,18 +136,18 @@
         const btn = document.querySelector(`[data-step-btn="${i}"]`);
         if (!btn) continue;
         btn.classList.toggle("is-active", i === n);
-        btn.classList.toggle("is-done", i < n && isPhaseComplete(i));
+        btn.classList.toggle("is-done", isPhaseComplete(i) && i !== n);
       }
 
-      // Hint + progress bar (Netflix-style red bar)
+      // Hint + progress bar (or obsidien)
       const hint = document.getElementById("wizardHint");
       if (hint) hint.textContent = WIZ_HINTS[n];
       const doneCount = Array.from({ length: WIZ_TOTAL_STEPS }, (_, k) => k + 1).filter(isPhaseComplete).length;
-      const pct = Math.round(((doneCount + (n - 1)) / (WIZ_TOTAL_STEPS * 2 - 1)) * 100);
+      const pct = Math.round((doneCount / WIZ_TOTAL_STEPS) * 100);
       const bar = document.getElementById("wizardProgressBar");
-      if (bar) bar.style.width = `${Math.min(100, pct)}%`;
+      if (bar) bar.style.width = `${pct}%`;
 
-      // Scroll to wizard nav top (sauf au chargement silencieux)
+      // Scroll léger vers le haut du parcours (sauf au chargement silencieux)
       if (!opts.silent) {
         const nav = document.getElementById("wizardNav");
         if (nav) nav.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -157,12 +169,13 @@
 
     function prevStep() { goToStep(wizCurrentStep - 1); }
 
-    function initCinematikWizard() {
+    function initObsidiaParcours() {
       goToStep(1, { silent: true });
-      // Refresh des états à chaque interaction (rating, vibes, sélection film…)
-      document.addEventListener("click", () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true })));
-      document.addEventListener("change", () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true })));
-      document.addEventListener("input", () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true })));
+      // Rafraîchir les états après chaque interaction (rating, vibes, sélection film…)
+      const refresh = () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true }));
+      document.addEventListener("click", refresh);
+      document.addEventListener("change", refresh);
+      document.addEventListener("input", refresh);
     }
 
     /* ---- UI v4.1 "Aurora Cinema" design enhancements (visual-only) ---- */
@@ -211,6 +224,152 @@
         modal.addEventListener("click", (e) => {
           if (e.target === modal) toggleModal(id);
         });
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DARIJA NLP — فهم الكلام الحر بالدارجة + Auto-remplissage
+       (Lexique riche : 100+ expressions sentiment/element)
+       ══════════════════════════════════════════════════════════════ */
+
+    // Expressions POSITIVES (darija + arabic script + latin translit.)
+    const POSITIVE_WORDS = [
+      "واعر","وااعر","وعار","خرافي","خرافي","أسطوري","اسطوري","ماستر class","masterclass","تحفة","تحيه",
+      "عجّبني","عجبني","عجبنيني","عجباتني","كيعجبني","إعجاب","حبني","قلبي","فقت بيه","فقت بيها","طالع",
+      "مضروب","مضروبة","نضيف","نضيفة","قوي","قوية","قوين","محكم","متقون","متقنة","متقان","مؤثر","مؤثرة",
+      "رائع","رائعة","جميل","جميلة","مدهش","مذهل","مبهر","باهر","ساحر","خارق","عميق","عميقة","حقيقي",
+      "أحسن","احسن","الأفضل","افضل","لايك","لايكي","Liked","liked","نجمة","5 نجوم","4.5","واو","wow",
+      "bravo","génial","genial","super","incroyable","bluffant","sublime","magnifique","chef-d'œuvre",
+      "chef d oeuvre","chef douvre","parfait","parfaite","excellent","top","قاصح","معجّب","mojjab",
+      "شدّني","شدني","خطفي","طير ليا عقلية","طيّر","جننتني","ولّه","ولاااه","نار","🔥","حلو","حلوة"
+    ];
+
+    // Expressions NÉGATIVES
+    const NEGATIVE_WORDS = [
+      "ضعيف","ضعيفة","ناقص","ما عجّبنيش","ما عجبنيش","ما عجباتنيش","مخيب","مخيّب","خاوي","خاوية","ملل",
+      "ملّ","ممل","مملة","ثقيل","ثقيلة","بطيء","بطيئة","بطيى","مطوط","مطوطة","زايغ","زايغة","كارثة",
+      "سيء","سيئة","وحش","واهية","واهٍ","تايه","ضياع","تاه","مكرور","مكروه","كريه","ما بانلي","ما بان ليا",
+      "ما فهمت والو","ما وصلنيش","ما وصل","بارد","باردة","سطحي","سطحية","مبالغ","مبالغة","أوفر","over",
+      "overrated","مزعج","مضجر","مضجرة","فاشل","فاشلة","ردئ","ردية","رديء","بائس","بائسة","اهرج","مهزلة",
+      "ennuyeux","ennuyeuse","mauvais","mauvaise","nul","nulle","raté","rate","décevant","decevant",
+      "médiocre","mediocre","boring","bad","weak","lourd","lent","lente","catastrophe","navet",
+      "صدمة","خيبة","خيب ظني","ما ساوا","ماساوا","ما يستاهل","ما كيستاهلش","حرّق وقتي","تيسكرة","tissakra"
+    ];
+
+    // Mots de NUANCE (mitigé)
+    const MIXED_WORDS = ["بين وبين","بين و بين","متفاوت","عايم","عادية شي حاجة","مقبول","لا هذا ولا ذاك","⚖️","mitigé","mixte"];
+
+    // Lexique par élément cinématographique (darija + fr + en)
+    const ELEMENT_KEYWORDS = [
+      { id: "story",            words: ["قصة","السيناريو","سيناريو","الحبكة","حبكة","الstory","story","script","scenario","القصة الأساسية","scénario","récit","recit","histoire"] },
+      { id: "direction",        words: ["الإخراج","اخراج","إخراج","خرج","المخرج","directeur","realisation","réalisation","realisation","direction","mise en scène","metteur","filmé","filmer"] },
+      { id: "acting",           words: ["التمثيل","تمثيل","الممثلين","ممثلين","الممثل","ممثل","الأداء","اداء","acting","acteur","actrice","cast","play","لعب","performances","distrib"] },
+      { id: "cinematography",   words: ["التصوير","تصوير","الكادر","كاميرا","camera","cinematography","image","الصورة","photographie","cadre","lampiste","éclairage","اضاءة","إضاءة","lighting","visuals"] },
+      { id: "pacing",           words: ["الإيقاع","ايقاع","الوتيرة"," ритм","pacing","rythme","ritmo","السرعة","بطيء","slow","fast","طول الفيلم","مدّة","duree","مدة","تقطيع الزمن"] },
+      { id: "score",            words: ["الموسيقى","موسيقى","الموسيقا","soundtrack","score","sound","الصوت","مؤثرات","son","musique","الصوتيات","sound design","audio","ألحان","alhan"] },
+      { id: "editing",          words: ["المونتاج","montage","editing","edit","القص","junction","coupe","cut","توليف","القطع","transition","انتقالات"] },
+      { id: "dialogue",         words: ["الحوارات","حوارات","الحوار","dialogue","dialogues","الكلمات","الديالوج","repliche","textes","الكتيبة","words"] },
+      { id: "worldbuilding",    words: ["الديكور","ديكور","الأجواء","اجواء","atmosphere","ambiance","production design","design","العالم","world","الشكل","visuel","decor","decorset","الجو","vibe visuelle"] },
+      { id: "ending",           words: ["النهاية","نهاية","ending","fin","la fin","finale","الخاتمة","آخر مشهد","آخر فيلم","climax","kick"] }
+    ];
+
+    // Mapping des vibe tags auto-détectés
+    const VIBE_MAPPING = [
+      { tag: "تحفة فنية (Masterpiece) 🏆",      words: ["تحفة","masterpiece","تحيه","chef d'oeuvre","chef-d'œuvre","من التحف"] },
+      { tag: "خلاني نفكر بزاف 🧠",              words: ["نفكر","فكرت","خلاني نفكر","thinking","makes me think","يطنب","تأمل"] },
+      { tag: "شدني من اللول حتى اللخر ⚡",      words: ["شدني","من اللول حتى اللخر","hooked","rivé","ma lachania","ما سرحش","ما شبعش"] },
+      { tag: "متعة بصرية خيالية 🎨",            words: ["متعة بصرية","بصري","visuel","visual","beautifully shot","louka","اللوحة البصرية"] },
+      { tag: "أجواء مظلمة ونفسية 🌑",           words: ["مظلم","نفسية","dark","psychologique","noir","ثيميل"] },
+      { tag: "كلاسيكية ما كتموتش 🎞️",          words: ["كلاسيك","classic","ما كتموتش"," خالد","khaled"] },
+      { tag: "ضحكني ووسع خاطري 😂",             words: ["ضحكني","ضحك","comedy","drôle","drole","khouya da7akni","وسع خاطري"] },
+      { tag: "قاصح ومؤثر عاطفياً 💔",           words: ["قاصح","بكا","بكيت","émotion","emotion","heartbreaking","مؤثر","safi bkit"] },
+      { tag: "غريب وفريد من نوعو 🌀",           words: ["غريب","unique","freak","weird","غرب","different","من نوعو"] },
+      { tag: "أوفرريتد شوية (Overrated)  overrated", words: ["أوفر","overrated","مبالغ فيه","ما يسوا هاد السمعة","n'est pas si bon"] },
+      { tag: "مظلوم إعلامياً (Underrated) 💎",  words: ["underrated","مظلوم","ما كيتعرفش","خاصو الشهرة","pas assez connu"] },
+      { tag: "فيلم ديال نص الليل 🌙",           words: ["نص الليل","minuit","night film","3la lechilia","ليلي"] }
+    ];
+
+    function detectSentimentInSegment(segment) {
+      const seg = segment.toLowerCase();
+      let pos = 0, neg = 0;
+      POSITIVE_WORDS.forEach(w => { if (seg.includes(w.toLowerCase())) pos++; });
+      NEGATIVE_WORDS.forEach(w => { if (seg.includes(w.toLowerCase())) neg++; });
+      MIXED_WORDS.forEach(w => { if (seg.includes(w.toLowerCase())) return "mixed"; });
+      if (pos > neg && pos > 0) return "positive";
+      if (neg > pos && neg > 0) return "negative";
+      if (pos > 0 && neg > 0) return "mixed";
+      return null;
+    }
+
+    function parseDarijaInsights(text) {
+      const result = { rating: null, liked: false, elementSentiments: {}, vibeTags: [] };
+      if (!text || !text.trim()) return result;
+      const t = text.trim();
+      const lower = t.toLowerCase();
+
+      // Extraction explicite des notes : 8/10, 4.5★, 3 نجوم…
+      const starMatch = t.match(/([0-9](?:[.,][0-5])?)\s*(?:★|نجمة|نجوم|\/\s*5)/);
+      const tenMatch  = t.match(/([0-9]{1,2})\s*\/\s*10/);
+      if (starMatch) result.rating = Math.min(5, Math.max(0.5, parseFloat(starMatch[1].replace(",", "."))));
+      else if (tenMatch) result.rating = Math.min(5, Math.max(0.5, Math.round((parseInt(tenMatch[1], 10) / 2) * 2) / 2));
+
+      // Liked explicite
+      if (/(liked|لايك|قليب|عجبني بزاف|حبيت(?:ه|و)?|love it|meilleur)/i.test(lower)) result.liked = true;
+
+      // Segmentation pour analyser chaque proposition séparément
+      const segments = t.split(/[،,;.！!؟?\n]+|(?:ولكن|mais|غير ان|غير|لاكن|walakin)/i).map(s => s.trim()).filter(Boolean);
+      segments.forEach(seg => {
+        const senti = detectSentimentInSegment(seg);
+        if (!senti) return;
+        ELEMENT_KEYWORDS.forEach(kw => {
+          if (kw.words.some(w => seg.toLowerCase().includes(w.toLowerCase()))) {
+            const mapped = senti === "positive" ? "Masterclass 🔥" : senti === "negative" ? "Weak / Underwhelming 👎" : "Mixed / Uneven ⚖️";
+            // On garde le sentiment le plus fort déjà enregistré sinon on ajoute
+            if (!result.elementSentiments[kw.id]) result.elementSentiments[kw.id] = mapped;
+          }
+        });
+      });
+
+      // Vibe tags détectés dans tout le texte
+      VIBE_MAPPING.forEach(vm => {
+        if (vm.words.some(w => lower.includes(w.toLowerCase()))) result.vibeTags.push(vm.tag);
+      });
+
+      // Sentiment global → note suggérée si aucune note explicite
+      if (result.rating === null) {
+        const overall = detectSentimentInSegment(t);
+        if (overall === "positive") result.rating = 4;
+        else if (overall === "negative") result.rating = 2;
+        else if (overall === "mixed") result.rating = 3;
+      }
+      return result;
+    }
+
+    // Rendus UI sans récursion (utilisés par l'auto-remplissage)
+    function setRatingBadgeOnly(val) {
+      const badge = document.getElementById("ratingBadgeDisplay");
+      if (!badge) return;
+      const fullStars = "★".repeat(Math.floor(val)) + (val % 1 ? "½" : "");
+      badge.textContent = `${fullStars} (${val}/5)`;
+      badge.className = "px-3 py-1 rounded-full text-xs font-mono font-black bg-lx-amber/20 text-lx-amber border border-lx-amber/40";
+    }
+    function toggleLikedRenderOnly() {
+      const btn = document.getElementById("likeToggleBtn");
+      const icon = document.getElementById("likeIcon");
+      if (!btn || !icon) return;
+      btn.className = "pill-btn flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl active-orange text-xs font-black";
+      icon.textContent = "❤️";
+    }
+
+    // Rafraîchir les selects de la matrice après extraction auto
+    function refreshElementsMatrixSelects() {
+      const container = document.getElementById("elementsMatrixContainer");
+      if (!container) return;
+      CINEMATIC_ELEMENTS.forEach((el, i) => {
+        const card = container.children[i];
+        if (!card) return;
+        const sel = card.querySelector("select");
+        if (sel && state.elements[el.id]) sel.value = state.elements[el.id];
       });
     }
 
@@ -628,11 +787,7 @@
       ["search", "rss", "csv"].forEach(t => {
         document.getElementById(`hubPanel-${t}`).classList.toggle("hidden", t !== tab);
         const btn = document.getElementById(`hubTab-${t}`);
-        if (t === tab) {
-          btn.className = "px-3.5 py-1.5 rounded-lg bg-lx-teal text-black font-bold transition";
-        } else {
-          btn.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition";
-        }
+        btn.classList.toggle("is-on", t === tab);
       });
     }
 
@@ -1044,6 +1199,9 @@
       const antiAi = document.getElementById("antiAiToggle").checked;
       const strictFact = document.getElementById("strictFactToggle").checked;
 
+      // Auto-extrait les données du champ "فكرة حرة" (compréhension de la Darija)
+      const insights = parseDarijaInsights(freeThoughts);
+
       // Collect only rated elements
       const ratedElements = [];
       CINEMATIC_ELEMENTS.forEach(el => {
@@ -1075,6 +1233,36 @@
         if (bestMoment) prompt += `  • أقوى نقطة أو مشهد عجبني: ${bestMoment}\n`;
         if (weakPoint) prompt += `  • نقطة الضعف أو اللي ما عجباتنيش: ${weakPoint}\n`;
         if (freeThoughts) prompt += `  • أفكاري الحرة: ${freeThoughts}\n`;
+      }
+
+      // Auto-remplissage intelligent : البيانات المستخرجة من الدارجة كتعمر الخانات الفارغة
+      const autoFilled = [];
+      if (!state.rating && insights.rating !== null) {
+        state.rating = insights.rating;
+        renderStarButtons();
+        setRatingBadgeOnly(insights.rating);
+        autoFilled.push(`التقييم: ${insights.rating}★`);
+      }
+      if (!state.liked && insights.liked) {
+        state.liked = true;
+        toggleLikedRenderOnly();
+        autoFilled.push("Liked ❤️");
+      }
+      ELEMENT_KEYWORDS.forEach(kw => {
+        const elId = kw.id;
+        if (!state.elements[elId] && insights.elementSentiments[elId]) {
+          state.elements[elId] = insights.elementSentiments[elId];
+          autoFilled.push(CINEMATIC_ELEMENTS.find(e => e.id === elId).label.split(" (")[0]);
+        }
+      });
+      if (autoFilled.length) refreshElementsMatrixSelects();
+      if (insights.vibeTags.length) {
+        insights.vibeTags.forEach(v => state.vibes.add(v));
+        renderVibeChips();
+        autoFilled.push(`Vibe: ${insights.vibeTags.join(" ، ")}`);
+      }
+      if (autoFilled.length) {
+        prompt += `\n🧠 [Auto-extrait من الكلام الحر ديالك بالدارجة — اعتباره رأي رسمي ديالي]:\n  • ${autoFilled.join("\n  • ")}\n`;
       }
 
       if (state.dna.favFilms || state.dna.criticalFocus || state.dna.samples || state.dna.avoidWords) {
@@ -1425,46 +1613,38 @@ const STUDIO_CONFIG = {
                            document.getElementById("journalModal").outerHTML + "\n" +
                            document.getElementById("toastBox").outerHTML;
 
-      const cleanIndexHtml = `<!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lumière — Cinematic Review Atelier v5.0</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"><\/script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            lx: { bg: '#06070d', card: '#10131f', surface: '#171b2b', border: '#262c42', text: '#a8b0c8', light: '#eef1fa', amber: '#ffb454', teal: '#2dd4bf', coral: '#fb7185' }
-          },
-          fontFamily: { sans: ['Alexandria', 'Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+      // Le ZIP exporté est un miroir fidèle du projet courant : on lit le vrai
+      // index.html depuis le disque (fetch), avec fallback sur une extraction DOM propre.
+      let cleanIndexHtml = null;
+      try {
+        const xhrIdx = new XMLHttpRequest();
+        xhrIdx.open("GET", "index.html", false);
+        xhrIdx.send();
+        if (xhrIdx.status === 200 && xhrIdx.responseText && xhrIdx.responseText.includes("OBSIDIA")) {
+          cleanIndexHtml = xhrIdx.responseText;
         }
+      } catch (err) { /* file:// → fallback ci-dessous */ }
+
+      if (!cleanIndexHtml) {
+        // Fallback offline : reconstruction depuis le DOM live (scripts plateforme exclus)
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll("script").forEach(s => s.remove());
+        cleanIndexHtml = "<!DOCTYPE html>\n" + clone.outerHTML;
       }
-    }
-  <\/script>
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body class="min-h-screen film-grain pb-28 selection:bg-lx-teal selection:text-black">
-  <div id="ambientBackdrop" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');"></div>
-  <div id="ambientOverlay"></div>
-
-  ${mainHtmlBody}
-
-  <!-- Clean Modular Scripts -->
-  <script src="js/config.js"><\/script>
-  <script src="js/app.js"><\/script>
-</body>
-</html>`;
 
       // 4. Extract JS logic (excluding STUDIO_CONFIG which is now in js/config.js)
-      const allScripts = Array.from(document.querySelectorAll("script"));
-      const mainAppScript = allScripts[allScripts.length - 1].innerHTML;
-      const appJsOnly = mainAppScript.replace(/const STUDIO_CONFIG = \{[\s\S]*?\};/, "// STUDIO_CONFIG is loaded from js/config.js");
+      let appJsOnly = "";
+      try {
+        const xhrApp = new XMLHttpRequest();
+        xhrApp.open("GET", "js/app.js", false);
+        xhrApp.send();
+        if (xhrApp.status === 200 && xhrApp.responseText) appJsOnly = xhrApp.responseText;
+      } catch (err) { /* fallback */ }
+      if (!appJsOnly) {
+        const allScripts = Array.from(document.querySelectorAll("script[src]"));
+        const inlineMain = allScripts.length ? "" : document.querySelectorAll("script")[document.querySelectorAll("script").length - 1].innerHTML;
+        appJsOnly = inlineMain.replace(/const STUDIO_CONFIG = \{[\s\S]*?\};/, "// STUDIO_CONFIG is loaded from js/config.js");
+      }
 
       // 5. Create README.md in Darija & English
       const readmeMd = `# 🎬 Lumière — Cinematic Review Atelier (Fanart.tv & TMDB Edition)

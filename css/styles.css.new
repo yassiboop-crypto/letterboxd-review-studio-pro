@@ -1,0 +1,388 @@
+/* =====================================================================
+   ✦ OBSIDIA — Cinematic Review Studio · Design System v7.0
+   ---------------------------------------------------------------------
+   Identité nouvelle : obsidienne noire + or blanc (signature unique),
+   style Apple TV / Netflix : sobre, profond, monotone + un seul accent.
+   Classes structurelles conservées : cinema-glass, pill-btn, wiz-panel,
+   wiz-step, hero-vignette, film-grain, reveal… (rien ne casse en JS).
+   ===================================================================== */
+
+:root {
+  /* ── Palette OBSIDIA ─────────────────────────────── */
+  --ob-bg: #0a0b10;          /* noir obsidienne         */
+  --ob-bg-raise: #0e1017;
+  --ob-card: #14161f;
+  --ob-surface: #1c1f2b;
+  --ob-border: #2b2f3f;
+  --ob-gold: #e2b567;        /* l'or — accent unique    */
+  --ob-gold-hi: #f6e3b4;
+  --ob-blue: #5eaef9;        /* bleu sobre (liens/infos)*/
+  --ob-green: #3fd6a4;       /* succès                  */
+  --ob-red: #ff5a6e;         /* danger léger            */
+
+  /* Compat anciens noms (lx-*) pour Tailwind config & JS */
+  --lx-bg: var(--ob-bg);
+  --lx-card: var(--ob-card);
+  --lx-surface: var(--ob-surface);
+  --lx-border: var(--ob-border);
+  --lx-amber: var(--ob-gold);
+  --lx-teal: var(--ob-gold);
+  --lx-coral: var(--ob-red);
+  --lx-purple: #b9a7f7;
+
+  /* Texte */
+  --text-hi: #f2f3f7;
+  --text-md: #c6cbd8;
+  --text-lo: #8b93a7;
+
+  /* Élévation & halos */
+  --shadow-sm: 0 2px 10px rgba(2, 3, 8, 0.55);
+  --shadow-md: 0 14px 36px rgba(2, 3, 8, 0.6);
+  --shadow-lg: 0 30px 70px rgba(1, 2, 6, 0.8);
+  --ring-focus: 0 0 0 3px rgba(226, 181, 103, 0.35);
+  --glow-gold: 0 0 24px rgba(226, 181, 103, 0.22);
+
+  /* Motion */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--ob-bg);
+  color: var(--text-md);
+  font-family: 'Alexandria', 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--ob-gold); color: #000; }
+
+/* Scrollbar discrète */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ob-bg); }
+::-webkit-scrollbar-thumb { background: #262a38; border-radius: 8px; border: 2px solid var(--ob-bg); }
+::-webkit-scrollbar-thumb:hover { background: #3a4054; }
+
+/* ════════ BRAND ════════ */
+.brand-word {
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--text-hi);
+}
+.brand-dot { color: var(--ob-gold); }
+.obs-ver-chip {
+  font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 2px 8px; border-radius: 999px;
+  color: var(--ob-gold);
+  background: rgba(226, 181, 103, 0.08);
+  border: 1px solid rgba(226, 181, 103, 0.35);
+}
+.obs-logo svg { filter: drop-shadow(0 0 10px rgba(226, 181, 103, 0.35)); }
+
+/* ════════ HEADER (Apple-TV blur) ════════ */
+.obs-header {
+  background: linear-gradient(to bottom, rgba(10, 11, 16, 0.92), rgba(10, 11, 16, 0.75));
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.obs-progress {
+  position: absolute; bottom: 0; right: 0; height: 3px;
+  background: linear-gradient(to left, var(--ob-gold), var(--ob-gold-hi));
+  box-shadow: 0 0 14px rgba(226, 181, 103, 0.7);
+  transition: width 0.7s var(--ease-out-quint);
+  border-radius: 0 0 0 4px;
+}
+
+/* ════════ AMBIANCE ════════ */
+#ambientBackdrop {
+  position: fixed; inset: 0; z-index: -3;
+  background-size: cover; background-position: center;
+  filter: saturate(0.75) brightness(0.5) blur(2px);
+  transition: background-image 0.9s ease;
+}
+#ambientOverlay {
+  position: fixed; inset: 0; z-index: -2;
+  background:
+    radial-gradient(ellipse 80% 55% at 70% -10%, rgba(226, 181, 103, 0.07), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 15% 110%, rgba(94, 174, 249, 0.05), transparent 60%),
+    linear-gradient(to bottom, rgba(10, 11, 16, 0.88) 0%, rgba(10, 11, 16, 0.96) 55%, var(--ob-bg) 100%);
+}
+#projectorBeam {
+  position: fixed; top: -12vh; right: -6vw; z-index: -1;
+  width: 46vw; height: 70vh; pointer-events: none;
+  background: conic-gradient(from 200deg at 100% 0%, rgba(226, 181, 103, 0.06), transparent 24%);
+  filter: blur(30px);
+  animation: beam-sway 14s ease-in-out infinite alternate;
+}
+@keyframes beam-sway { from { transform: rotate(-2deg); opacity: 0.7; } to { transform: rotate(3deg); opacity: 1; } }
+
+.film-grain::after {
+  content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* ════════ GLASS CARDS ════════ */
+.cinema-glass {
+  position: relative;
+  background: linear-gradient(160deg, rgba(28, 31, 43, 0.72), rgba(20, 22, 31, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--shadow-md);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.cinema-glass:hover {
+  border-color: rgba(226, 181, 103, 0.22);
+  box-shadow: var(--shadow-md), var(--glow-gold);
+}
+.obs-border-top-accent { border-top: 2px solid rgba(226, 181, 103, 0.5) !important; }
+
+/* ════════ HERO BILLBOARD (style Netflix) ════════ */
+.obs-billboard { box-shadow: var(--shadow-lg); }
+.hero-vignette {
+  background:
+    linear-gradient(to top, var(--ob-bg) 4%, rgba(10, 11, 16, 0.86) 48%, rgba(10, 11, 16, 0.25) 100%),
+    radial-gradient(ellipse 90% 70% at 50% 0%, transparent 40%, rgba(1, 2, 6, 0.55) 100%);
+}
+.obs-poster { transition: transform 0.35s var(--ease-spring), box-shadow 0.35s ease; }
+.group:hover .obs-poster { transform: scale(1.03) translateY(-4px); box-shadow: 0 26px 60px rgba(0,0,0,0.9), var(--glow-gold); }
+
+/* Chips du hero */
+.obs-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  padding: 5px 12px; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72); color: var(--text-md);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+}
+.obs-chip-purple { color: #d8c9ff; border-color: rgba(185, 167, 247, 0.35); }
+.obs-chip-btn { cursor: pointer; transition: all 0.25s ease; }
+.obs-chip-btn:hover { border-color: var(--ob-gold); color: var(--ob-gold-hi); }
+.obs-count {
+  background: var(--ob-gold); color: #000;
+  padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 900;
+}
+
+/* ════════ WIZARD STEPS (Apple-TV style segmented) ════════ */
+.obs-steps { list-style: none; margin: 0; padding: 0; display: flex; align-items: stretch; gap: 4px; overflow-x: auto; }
+.obs-steps li { display: flex; align-items: center; }
+.obs-steps li + li::before {
+  content: ""; width: 22px; height: 1px; flex-shrink: 0;
+  background: linear-gradient(to left, rgba(226,181,103,0.5), rgba(255,255,255,0.08));
+  margin: 0 4px;
+}
+.wiz-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; border-radius: 14px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-lo); cursor: pointer; text-align: right;
+  transition: all 0.28s var(--ease-out-quint); white-space: nowrap;
+}
+.wiz-step:hover { color: var(--text-hi); background: rgba(255, 255, 255, 0.04); }
+.wiz-num {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.18); color: var(--text-lo);
+  transition: all 0.28s ease;
+}
+.wiz-txt b { display: block; font-size: 12px; font-weight: 800; }
+.wiz-txt small { display: block; font-size: 10px; opacity: 0.7; }
+.wiz-step.is-active {
+  background: linear-gradient(160deg, rgba(226, 181, 103, 0.16), rgba(226, 181, 103, 0.05));
+  border-color: rgba(226, 181, 103, 0.45);
+  color: var(--ob-gold-hi);
+  box-shadow: var(--glow-gold);
+}
+.wiz-step.is-active .wiz-num {
+  background: var(--ob-gold); border-color: var(--ob-gold); color: #000;
+}
+.wiz-step.is-done .wiz-num {
+  background: rgba(63, 214, 164, 0.15); border-color: rgba(63, 214, 164, 0.5); color: var(--ob-green);
+}
+.wiz-step.is-done .wiz-num::after { content: "✓"; font-size: 12px; }
+.wiz-step.is-done .wiz-num { font-size: 0; }
+.wiz-step.is-done .wiz-num::after { font-size: 12px; }
+
+/* Navigation précédent / suivant */
+.obs-nav-btn {
+  font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-md); cursor: pointer; transition: all 0.25s ease;
+}
+.obs-nav-btn:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+.obs-nav-next {
+  background: linear-gradient(120deg, var(--ob-gold), #d9a24a);
+  color: #000; border-color: transparent; font-weight: 900;
+  box-shadow: 0 6px 20px rgba(226, 181, 103, 0.3);
+}
+.obs-nav-next:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+/* Pan de phase : entrée cinématographique */
+.wiz-panel[hidden], .wiz-panel.hidden { display: none; }
+.wiz-panel:not(.hidden) { animation: panel-in 0.55s var(--ease-out-quint) both; }
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* Badge numéro de phase (carré sobre doré) */
+.obs-phase-badge {
+  width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: rgba(226, 181, 103, 0.1);
+  border: 1px solid rgba(226, 181, 103, 0.4);
+  color: var(--ob-gold); font-weight: 900; font-family: 'JetBrains Mono', monospace;
+}
+
+/* ════════ BOUTONS GLOBAUX ════════ */
+.pill-btn { transition: transform 0.2s var(--ease-spring), box-shadow 0.25s ease, border-color 0.25s ease; }
+.pill-btn:hover { transform: translateY(-2px); }
+.pill-btn:active { transform: translateY(0) scale(0.98); }
+.pill-btn:focus-visible, .obs-btn-pill:focus-visible, button:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+
+.pill-btn.active-green, .pill-btn.active-orange, .pill-btn.active-blue {
+  background: rgba(226, 181, 103, 0.14);
+  border-color: var(--ob-gold);
+  color: var(--ob-gold-hi);
+  box-shadow: var(--glow-gold);
+}
+
+.obs-btn-pill {
+  font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 12px;
+  background: rgba(28, 31, 43, 0.9); color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer; transition: all 0.25s ease;
+}
+.obs-btn-pill:hover { border-color: rgba(226, 181, 103, 0.5); transform: translateY(-1px); }
+.obs-btn-gold {
+  background: linear-gradient(120deg, var(--ob-gold), #d9a24a);
+  color: #000; font-weight: 900; border-color: transparent;
+  box-shadow: 0 6px 22px rgba(226, 181, 103, 0.32);
+}
+.obs-btn-dna { color: #d8c9ff; border-color: rgba(185, 167, 247, 0.3); background: rgba(139, 122, 235, 0.1); }
+.obs-btn-danger { color: #ffb3ba; border-color: rgba(255, 90, 110, 0.3); background: rgba(255, 90, 110, 0.07); }
+
+.obs-btn-solid-gold {
+  padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 12px;
+  background: linear-gradient(120deg, var(--ob-gold), #d9a24a); color: #000;
+  border: none; cursor: pointer; transition: all 0.25s ease;
+  box-shadow: 0 6px 22px rgba(226, 181, 103, 0.28);
+}
+.obs-btn-solid-gold:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.obs-btn-solid-blue {
+  padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 12px;
+  background: linear-gradient(120deg, var(--ob-blue), #3d8fd8); color: #04101c;
+  border: none; cursor: pointer; transition: all 0.25s ease;
+  box-shadow: 0 6px 22px rgba(94, 174, 249, 0.25);
+}
+.obs-btn-solid-blue:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.obs-btn-outline-danger {
+  padding: 8px 14px; border-radius: 12px; font-weight: 700; font-size: 12px;
+  background: rgba(255, 90, 110, 0.08); color: #ffb3ba;
+  border: 1px solid rgba(255, 90, 110, 0.3); cursor: pointer;
+}
+.obs-btn-outline-danger:hover { background: rgba(255, 90, 110, 0.15); }
+
+.obs-mini-btn {
+  font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-md); cursor: pointer; transition: all 0.22s ease;
+}
+.obs-mini-btn:hover { color: #fff; border-color: rgba(226, 181, 103, 0.45); }
+.obs-mini-green { color: var(--ob-gold-hi); background: rgba(226, 181, 103, 0.1); border-color: rgba(226, 181, 103, 0.35); }
+
+/* ════════ INPUTS UNIFORMES ════════ */
+.obs-label {
+  display: block; font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-lo); margin-bottom: 5px; font-weight: 700;
+}
+.obs-input {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px; padding: 9px 13px;
+  color: #fff; font-size: 12px;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+.obs-input:hover { background: rgba(0, 0, 0, 0.7); }
+.obs-input:focus { outline: none; border-color: var(--ob-gold); box-shadow: var(--ring-focus); }
+.obs-input-strong { padding: 11px 15px; font-weight: 700; font-size: 14px; background: rgba(0, 0, 0, 0.68); }
+.obs-input-sm { padding: 6px 11px; font-size: 11px; }
+.obs-input-mono { font-family: 'JetBrains Mono', monospace; }
+select.obs-input option { background: var(--ob-card); color: #fff; }
+
+/* ════════ TABS (hub) ════════ */
+.obs-tabs {
+  display: flex; gap: 2px; padding: 4px; border-radius: 14px;
+  background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px; font-weight: 700;
+}
+.obs-tab {
+  padding: 7px 14px; border-radius: 10px; color: var(--text-md);
+  background: transparent; border: none; cursor: pointer; transition: all 0.25s ease;
+}
+.obs-tab:hover { color: #fff; }
+.obs-tab.is-on, .obs-tab[style*="lx-teal"] {
+  background: linear-gradient(120deg, var(--ob-gold), #d9a24a); color: #000;
+  box-shadow: 0 4px 14px rgba(226, 181, 103, 0.3);
+}
+
+/* ════════ DROPZONE CSV ════════ */
+.obs-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.14); border-radius: 20px;
+  padding: 26px; text-align: center; background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.obs-dropzone:hover { border-color: rgba(226, 181, 103, 0.55); background: rgba(226, 181, 103, 0.04); }
+
+/* ════════ GRILLE POSTERS (hover Netflix) ════════ */
+.obs-poster-grid > * {
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.obs-poster-grid > *:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7), var(--glow-gold);
+  border-color: rgba(226, 181, 103, 0.5) !important;
+}
+
+/* ════════ BADGE NOTE ════════ */
+.obs-rating-badge {
+  padding: 5px 13px; border-radius: 999px;
+  font-size: 12px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+  background: rgba(255, 255, 255, 0.07); color: var(--text-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ════════ SLIDERS ════════ */
+input[type="range"] { -webkit-appearance: none; appearance: none; }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--ob-gold); border: 2px solid #000;
+  box-shadow: 0 0 10px rgba(226, 181, 103, 0.6); cursor: pointer;
+}
+
+/* ════════ REVEAL & MODALS ════════ */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease-out-quint), transform 0.7s var(--ease-out-quint); }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+.modal-open, .fixed:not(.hidden) > .cinema-glass { animation: modal-pop 0.35s var(--ease-spring) both; }
+@keyframes modal-pop { from { opacity: 0; transform: scale(0.94) translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ════════ TOAST ════════ */
+#toastBox { box-shadow: 0 12px 34px rgba(0, 0, 0, 0.6), var(--glow-gold); }
+
+/* ════════ A11Y & RESPONSIVE ════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+@media (max-width: 900px) {
+  #projectorBeam { display: none; }
+  .wiz-txt small { display: none; }
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
