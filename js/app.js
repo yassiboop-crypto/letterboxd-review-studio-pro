@@ -75,7 +75,57 @@
       renderVibeChips();
       renderJournalCount();
       updateMasterPromptPreview();
+      initDesignEnhancements();
     });
+
+    /* ---- UI v4.1 "Aurora Cinema" design enhancements (visual-only) ---- */
+    function initDesignEnhancements() {
+      // 1) Cursor spotlight tracking on glass cards (--mx/--my for CSS glow)
+      let rafPending = false;
+      document.querySelectorAll(".cinema-glass").forEach((card) => {
+        card.addEventListener("pointermove", (e) => {
+          if (rafPending) return;
+          rafPending = true;
+          requestAnimationFrame(() => {
+            rafPending = false;
+            const r = card.getBoundingClientRect();
+            card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+            card.style.setProperty("--my", `${e.clientY - r.top}px`);
+          });
+        });
+      });
+
+      // 2) Scroll-reveal entrance animation for main sections
+      const revealEls = document.querySelectorAll("main section, main .grid > div > section");
+      if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.06, rootMargin: "0px 0px -40px 0px" });
+        revealEls.forEach((el) => { el.classList.add("reveal"); io.observe(el); });
+      }
+
+      // 3) Close modals with Escape key & backdrop click (UX polish)
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          ["apiModal", "dnaModal", "journalModal"].forEach((id) => {
+            const m = document.getElementById(id);
+            if (m && !m.classList.contains("hidden")) toggleModal(id);
+          });
+        }
+      });
+      ["apiModal", "dnaModal", "journalModal"].forEach((id) => {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) toggleModal(id);
+        });
+      });
+    }
 
     function showToast(msg, isWarning = false) {
       const box = document.getElementById("toastBox");
@@ -1264,7 +1314,18 @@ const STUDIO_CONFIG = {
 `;
 
       // 2. Extract CSS into css/styles.css
-      const styleTagContent = document.querySelector("style").innerHTML;
+      const styleTagContent = (() => {
+        // Prefer the real modular stylesheet (css/styles.css) for the ZIP export;
+        // fall back to any inline <style> tag if fetch is unavailable (e.g. file://).
+        try {
+          const xhr = new XMLHttpRequest();
+          xhr.open("GET", "css/styles.css", false);
+          xhr.send();
+          if (xhr.status === 200 && xhr.responseText) return xhr.responseText;
+        } catch (err) { /* ignore and fall back */ }
+        const styleEl = document.querySelector("style");
+        return styleEl ? styleEl.innerHTML : "";
+      })();
 
       // 3. Extract Clean HTML without any platform-injected scripts
       const mainHtmlBody = document.querySelector("header").outerHTML + "\n" +
