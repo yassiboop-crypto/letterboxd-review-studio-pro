@@ -1,38 +1,49 @@
-
 /* =====================================================================
-   LETTERBOXD STUDIO ULTRA — Design System v4.1 "Aurora Cinema"
-   Modernized: refined tokens, aurora ambient glow, spotlight glass cards,
-   premium micro-interactions, better contrast & accessibility.
-   NOTE: All structural class names kept identical to index.html / app.js
-   (cinema-glass, pill-btn, active-green/orange/blue, hero-vignette, etc.)
+   ✦ LUMIÈRE — Cinematic Review Atelier · Design System v5.0 "Lumière"
+   ---------------------------------------------------------------------
+   Identité nouvelle : encre bleu-nuit profonde + or de projection
+   (ambre), turquoise cinéma, corail chaud. Ambiance : faisceau de
+   projecteur, rails de pellicule, verre fumé, halos lumineux.
+   NOTE : tous les noms de classes structurels restent identiques à
+   index.html / js/app.js (cinema-glass, pill-btn, active-green/orange/
+   blue, hero-vignette, film-grain, reveal…) — rien ne casse.
    ===================================================================== */
 
 :root {
-  --dynamic-accent: #00e054;
+  --dynamic-accent: #2dd4bf;
 
-  /* Core palette (same hues, refined depth) */
-  --lb-bg: #070a0f;
-  --lb-bg-raise: #0b0f16;
-  --lb-card: #14181f;
-  --lb-surface: #1c222d;
-  --lb-border: #283142;
-  --lb-orange: #ff8000;
-  --lb-green: #00e054;
-  --lb-blue: #40bcf4;
-  --lb-purple: #a78bfa;
+  /* ── Palette Lumière ─────────────────────────────── */
+  --lx-bg: #06070d;          /* encre nuit           */
+  --lx-bg-raise: #0a0c15;    /* voile élevé          */
+  --lx-card: #10131f;        /* carte fumée          */
+  --lx-surface: #171b2b;     /* surface intermédiaire*/
+  --lx-border: #262c42;      /* bordure bleutée      */
+  --lx-amber: #ffb454;       /* or du projecteur     */
+  --lx-teal: #2dd4bf;        /* turquoise cinéma     */
+  --lx-coral: #fb7185;       /* corail chaud         */
+  --lx-purple: #a78bfa;      /* violet créatif       */
 
-  /* Semantic text tokens */
-  --text-hi: #f1f5f9;
-  --text-md: #cbd5e1;
-  --text-lo: #8b98ad;
+  /* Compatibilité avec l'ancien vocabulaire (mêmes rôles) */
+  --lb-border: var(--lx-border);
+  --lb-orange: var(--lx-coral);
+  --lb-green: var(--lx-amber);
+  --lb-blue: var(--lx-teal);
+  --lb-bg: var(--lx-bg);
 
-  /* Elevation system */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
-  --ring-focus: 0 0 0 3px rgba(64, 188, 244, 0.35);
+  /* Texte */
+  --text-hi: #eef1fa;
+  --text-md: #c3cadb;
+  --text-lo: #8792ab;
 
-  /* Motion tokens */
+  /* Élévation */
+  --shadow-sm: 0 2px 10px rgba(3, 4, 10, 0.45);
+  --shadow-md: 0 12px 34px rgba(3, 4, 10, 0.55);
+  --shadow-lg: 0 28px 70px rgba(2, 3, 8, 0.7);
+  --ring-focus: 0 0 0 3px rgba(45, 212, 191, 0.35);
+  --glow-amber: 0 0 26px rgba(255, 180, 84, 0.30);
+  --glow-teal: 0 0 26px rgba(45, 212, 191, 0.25);
+
+  /* Motion */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -45,7 +56,7 @@
 * { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--lb-bg);
+  background-color: var(--lx-bg);
   color: var(--text-md);
   font-family: 'Alexandria', 'Plus Jakarta Sans', sans-serif;
   overflow-x: hidden;
@@ -53,9 +64,40 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-::selection { background: rgba(0, 224, 84, 0.35); color: #fff; }
+::selection { background: rgba(45, 212, 191, 0.35); color: #fff; }
 
-/* ---------- Ambient Dynamic Cinema Backdrop (aurora layer) ---------- */
+/* ---------- Marque : typographie Lumière ---------- */
+.brand-word {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-hi);
+  line-height: 1;
+}
+.brand-e {
+  background: linear-gradient(120deg, var(--lx-amber), var(--lx-coral));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.brand-dot { color: var(--lx-teal); }
+.lumen-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 180, 84, 0.16), rgba(6, 7, 13, 0.9) 70%);
+  border: 1px solid rgba(255, 180, 84, 0.35);
+  box-shadow: var(--glow-amber), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: lumenBreathe 5s ease-in-out infinite;
+}
+@keyframes lumenBreathe {
+  0%, 100% { box-shadow: var(--glow-amber), inset 0 1px 0 rgba(255, 255, 255, 0.08); }
+  50%      { box-shadow: 0 0 38px rgba(255, 180, 84, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08); }
+}
+
+/* ---------- Fond ambiant dynamique (photo du film) ---------- */
 #ambientBackdrop {
   position: fixed;
   inset: 0;
@@ -63,8 +105,8 @@ body {
   background-size: cover;
   background-position: center 20%;
   transition: background-image 0.9s var(--ease-out-quint), opacity 0.8s ease;
-  opacity: 0.3;
-  filter: blur(30px) saturate(1.35) brightness(0.85);
+  opacity: 0.26;
+  filter: blur(32px) saturate(1.25) brightness(0.72);
   transform: scale(1.08);
 }
 #ambientOverlay {
@@ -72,13 +114,60 @@ body {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(1200px 500px at 85% -10%, rgba(64, 188, 244, 0.10), transparent 60%),
-    radial-gradient(900px 420px at 10% -5%, rgba(0, 224, 84, 0.08), transparent 55%),
-    radial-gradient(700px 500px at 50% 110%, rgba(255, 128, 0, 0.06), transparent 60%),
-    radial-gradient(circle at 50% 0%, rgba(11, 14, 19, 0.45) 0%, rgba(9, 12, 16, 0.94) 65%, var(--lb-bg) 100%);
+    radial-gradient(1100px 480px at 82% -10%, rgba(45, 212, 191, 0.09), transparent 60%),
+    radial-gradient(900px 420px at 12% -5%, rgba(255, 180, 84, 0.08), transparent 55%),
+    radial-gradient(760px 520px at 50% 112%, rgba(251, 113, 133, 0.06), transparent 60%),
+    radial-gradient(circle at 50% 0%, rgba(10, 12, 21, 0.45) 0%, rgba(6, 7, 13, 0.94) 65%, var(--lx-bg) 100%);
 }
 
-/* Slow aurora drift behind everything (pure CSS, no JS hooks needed) */
+/* ---------- Faisceau du projecteur (signature Lumière) ---------- */
+#projectorBeam {
+  position: fixed;
+  top: -12vh;
+  right: -8vw;
+  width: 55vw;
+  height: 85vh;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(208deg, rgba(255, 180, 84, 0.10) 0%, rgba(255, 180, 84, 0.035) 32%, transparent 62%);
+  clip-path: polygon(100% 0%, 100% 18%, 12% 100%, -6% 78%);
+  filter: blur(28px);
+  animation: beamFlicker 7s ease-in-out infinite alternate;
+}
+@keyframes beamFlicker {
+  0%   { opacity: 0.75; }
+  45%  { opacity: 1; }
+  60%  { opacity: 0.85; }
+  100% { opacity: 0.95; }
+}
+
+/* ---------- Rails de pellicule sur les bords ---------- */
+.filmstrip-rail {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    repeating-linear-gradient(to bottom,
+      transparent 0 14px,
+      rgba(238, 241, 250, 0.07) 14px 26px,
+      transparent 26px 40px),
+    linear-gradient(to bottom, rgba(6, 7, 13, 0.6), rgba(6, 7, 13, 0.2));
+  border-inline: 1px solid rgba(255, 255, 255, 0.05);
+  animation: railScroll 14s linear infinite;
+}
+.rail-start { inset-inline-start: 6px; }
+.rail-end   { inset-inline-end: 6px; }
+@keyframes railScroll {
+  from { background-position-y: 0, 0; }
+  to   { background-position-y: 40px, 0; }
+}
+@media (max-width: 900px) { .filmstrip-rail { display: none; } }
+
+/* ---------- Halo lent derrière tout (CSS pur) ---------- */
 body::before {
   content: "";
   position: fixed;
@@ -86,37 +175,36 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(38% 30% at 20% 15%, rgba(64, 188, 244, 0.07), transparent 70%),
-    radial-gradient(34% 28% at 80% 25%, rgba(167, 139, 250, 0.06), transparent 70%),
-    radial-gradient(40% 32% at 55% 85%, rgba(0, 224, 84, 0.05), transparent 70%);
-  animation: auroraDrift 26s ease-in-out infinite alternate;
+    radial-gradient(38% 30% at 20% 15%, rgba(45, 212, 191, 0.06), transparent 70%),
+    radial-gradient(34% 28% at 80% 25%, rgba(167, 139, 250, 0.05), transparent 70%),
+    radial-gradient(40% 32% at 55% 85%, rgba(255, 180, 84, 0.05), transparent 70%);
+  animation: ambientDrift 28s ease-in-out infinite alternate;
 }
-@keyframes auroraDrift {
+@keyframes ambientDrift {
   from { transform: translate3d(-2%, -1%, 0) rotate(0.001deg); }
   to   { transform: translate3d(2%, 2%, 0) rotate(0.001deg); }
 }
 
-/* ---------- Film Grain Texture (finer, layered) ---------- */
+/* ---------- Grain argentique fin ---------- */
 .film-grain {
   background-image:
-    radial-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 0),
+    radial-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 0),
     radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 0);
   background-size: 24px 24px, 32px 32px;
   background-position: 0 0, 12px 12px;
 }
 
-/* ---------- Glassmorphism Cards — with cursor spotlight ---------- */
+/* ---------- Cartes verre fumé + spotlight suit la souris ---------- */
 .cinema-glass {
   position: relative;
   isolation: isolate;
-  background: linear-gradient(160deg, rgba(28, 34, 45, 0.72), rgba(16, 20, 27, 0.82));
-  backdrop-filter: blur(22px) saturate(1.25);
-  -webkit-backdrop-filter: blur(22px) saturate(1.25);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  background: linear-gradient(160deg, rgba(23, 27, 43, 0.74), rgba(13, 16, 26, 0.85));
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: border-color 0.35s var(--ease-spring), box-shadow 0.35s var(--ease-spring), transform 0.35s var(--ease-spring);
 }
-/* Mouse-tracking spotlight (set by JS below; degrades gracefully) */
 .cinema-glass::before {
   content: "";
   position: absolute;
@@ -125,19 +213,19 @@ body::before {
   z-index: -1;
   opacity: 0;
   transition: opacity 0.4s ease;
-  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(64, 188, 244, 0.10), transparent 45%);
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 180, 84, 0.09), transparent 45%);
 }
 .cinema-glass:hover::before { opacity: 1; }
 .cinema-glass:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 180, 84, 0.22);
   transform: translateY(-1px);
 }
 .cinema-glass-hover:hover {
-  border-color: rgba(0, 224, 84, 0.35);
-  box-shadow: var(--shadow-lg), 0 0 28px rgba(0, 224, 84, 0.10);
+  border-color: rgba(45, 212, 191, 0.35);
+  box-shadow: var(--shadow-lg), 0 0 28px rgba(45, 212, 191, 0.10);
 }
 
-/* Section entrance reveal */
+/* Apparition au scroll */
 .reveal {
   opacity: 0;
   transform: translateY(18px);
@@ -145,25 +233,25 @@ body::before {
 }
 .reveal.is-visible { opacity: 1; transform: none; }
 
-/* ---------- Hero Showcase Banner ---------- */
+/* ---------- Bandeau Héro cinématique ---------- */
 #heroShowcase {
   background-size: cover;
   background-position: center 25%;
   transition: background-image 0.7s ease-in-out, box-shadow 0.4s ease;
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 180, 84, 0.10);
 }
 .hero-vignette {
   background:
-    linear-gradient(to top, var(--lb-bg) 5%, rgba(9, 12, 16, 0.82) 50%, rgba(9, 12, 16, 0.35) 100%),
-    linear-gradient(to left, rgba(9, 12, 16, 0.9) 0%, transparent 60%);
+    linear-gradient(to top, var(--lx-bg) 5%, rgba(6, 7, 13, 0.84) 50%, rgba(6, 7, 13, 0.35) 100%),
+    linear-gradient(to left, rgba(6, 7, 13, 0.9) 0%, transparent 60%);
 }
-/* Subtle cinematic shimmer sweeping across the hero once in a while */
+/* Balayage de lumière façon cabine de projection */
 #heroShowcase::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.05) 50%, transparent 58%);
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 214, 153, 0.07) 50%, transparent 58%);
   transform: translateX(-120%);
   animation: heroSheen 9s var(--ease-out-quint) infinite;
 }
@@ -171,13 +259,11 @@ body::before {
   0%, 72% { transform: translateX(-120%); }
   100%    { transform: translateX(120%); }
 }
-
-/* Poster card lift inside hero */
 #heroShowcase img#heroPosterImg {
   transition: transform 0.45s var(--ease-spring), filter 0.45s ease;
 }
 
-/* ---------- Interactive Elements ---------- */
+/* ---------- Boutons ---------- */
 .pill-btn {
   transition: all 0.22s var(--ease-spring);
   will-change: transform;
@@ -186,27 +272,27 @@ body::before {
 .pill-btn:active { transform: translateY(0) scale(0.98); }
 .pill-btn:focus-visible { outline: none; box-shadow: var(--ring-focus); }
 
+/* États actifs (noms conservés pour JS : green/orange/blue) */
 .pill-btn.active-green {
-  background: linear-gradient(135deg, rgba(0, 224, 84, 0.28), rgba(0, 224, 84, 0.10));
-  border-color: var(--lb-green);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.28), rgba(45, 212, 191, 0.10));
+  border-color: var(--lx-teal);
   color: #ffffff;
-  box-shadow: 0 0 22px rgba(0, 224, 84, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 .pill-btn.active-orange {
-  background: linear-gradient(135deg, rgba(255, 128, 0, 0.28), rgba(255, 128, 0, 0.10));
-  border-color: var(--lb-orange);
+  background: linear-gradient(135deg, rgba(255, 180, 84, 0.28), rgba(255, 180, 84, 0.10));
+  border-color: var(--lx-amber);
   color: #ffffff;
-  box-shadow: 0 0 22px rgba(255, 128, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 22px rgba(255, 180, 84, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 .pill-btn.active-blue {
-  background: linear-gradient(135deg, rgba(64, 188, 244, 0.28), rgba(64, 188, 244, 0.10));
-  border-color: var(--lb-blue);
+  background: linear-gradient(135deg, rgba(251, 113, 133, 0.26), rgba(251, 113, 133, 0.09));
+  border-color: var(--lx-coral);
   color: #ffffff;
-  box-shadow: 0 0 22px rgba(64, 188, 244, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 22px rgba(251, 113, 133, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* Gradient CTA buttons (Tailwind bg-gradient-to-r helpers get overridden
-   here for a richer, animated sheen — same classes, prettier result) */
+/* CTA dégradés : reflet animé au survol */
 button.bg-gradient-to-r {
   position: relative;
   overflow: hidden;
@@ -222,7 +308,7 @@ button.bg-gradient-to-r::after {
 }
 button.bg-gradient-to-r:hover::after { transform: translateX(110%); }
 
-/* Inputs & selects — unified premium focus states */
+/* Inputs & selects */
 input:not([type="range"]):not([type="checkbox"]):not([type="file"]),
 select, textarea {
   transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
@@ -233,27 +319,25 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 select { cursor: pointer; }
 
-/* Range sliders — chunkier thumbs */
+/* Sliders */
 input[type="range"] { cursor: pointer; }
-input[type="range"]::-webkit-slider-thumb {
-  transition: transform 0.15s ease;
-}
+input[type="range"]::-webkit-slider-thumb { transition: transform 0.15s ease; }
 input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.25); }
 
-/* Search-result / RSS cards (rendered dynamically by app.js into grids) */
+/* Cartes de résultats (rendues par app.js) */
 #searchResultsGrid > *, #rssResultsGrid > *, #csvResultsGrid > * {
   transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), border-color 0.3s ease;
 }
 #searchResultsGrid > *:hover, #rssResultsGrid > *:hover {
   transform: translateY(-4px) scale(1.015);
-  box-shadow: var(--shadow-md), 0 0 0 1px rgba(64, 188, 244, 0.35);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(45, 212, 191, 0.35);
 }
 #csvResultsGrid > *:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0, 224, 84, 0.30);
+  box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255, 180, 84, 0.35);
 }
 
-/* Fanart gallery thumbnails */
+/* Galerie Fanart */
 #fanartGalleryGrid > * {
   transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease, outline-color 0.2s ease;
 }
@@ -262,11 +346,11 @@ input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.25); }
   box-shadow: var(--shadow-md);
 }
 
-/* Header — refined sticky bar with fade-in */
+/* Header collant */
 header.sticky {
-  background: linear-gradient(to bottom, rgba(7, 10, 15, 0.88), rgba(7, 10, 15, 0.72));
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: linear-gradient(to bottom, rgba(6, 7, 13, 0.9), rgba(6, 7, 13, 0.72));
+  backdrop-filter: blur(24px) saturate(1.35);
+  -webkit-backdrop-filter: blur(24px) saturate(1.35);
   animation: slideDown 0.5s var(--ease-out-quint) both;
 }
 @keyframes slideDown {
@@ -274,7 +358,7 @@ header.sticky {
   to   { transform: translateY(0); opacity: 1; }
 }
 
-/* Modals — springy entry + darkened scene */
+/* Modales */
 #apiModal > div, #dnaModal > div, #journalModal > div {
   animation: modalPop 0.35s var(--ease-spring) both;
 }
@@ -285,11 +369,11 @@ header.sticky {
 
 /* Toast */
 #toastBox {
-  box-shadow: var(--shadow-lg), 0 0 30px rgba(0, 224, 84, 0.25);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(45, 212, 191, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* Details/summary prompt preview */
+/* Details/summary */
 details summary::-webkit-details-marker { display: none; }
 details[open] > div { animation: fadeInUp 0.4s var(--ease-out-quint) both; }
 @keyframes fadeInUp {
@@ -297,27 +381,25 @@ details[open] > div { animation: fadeInUp 0.4s var(--ease-out-quint) both; }
   to   { opacity: 1; transform: none; }
 }
 
-/* Numbered step badges — soft pulse on hover of their section header */
 section h2 + p { color: var(--text-lo); }
 
-/* Custom Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--lb-bg); }
+::-webkit-scrollbar-track { background: var(--lx-bg); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--lb-border), #35415a);
+  background: linear-gradient(var(--lx-border), #333c5c);
   border-radius: 99px;
-  border: 2px solid var(--lb-bg);
+  border: 2px solid var(--lx-bg);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--lb-blue); }
+::-webkit-scrollbar-thumb:hover { background: var(--lx-teal); }
 
-/* Keyboard-accessible focus for generic links/buttons without pill-btn */
 a:focus-visible, [role="button"]:focus-visible {
-  outline: 2px solid var(--lb-blue);
+  outline: 2px solid var(--lx-teal);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* ---------- Reduced motion: keep it calm ---------- */
+/* Accessibilité mouvement réduit */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -327,8 +409,9 @@ a:focus-visible, [role="button"]:focus-visible {
   .reveal { opacity: 1; transform: none; }
 }
 
-/* ---------- Responsive polish ---------- */
+/* Responsive */
 @media (max-width: 640px) {
-  #ambientBackdrop { filter: blur(22px) saturate(1.3) brightness(0.8); }
+  #ambientBackdrop { filter: blur(22px) saturate(1.25) brightness(0.7); }
+  #projectorBeam { display: none; }
   .cinema-glass { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 }

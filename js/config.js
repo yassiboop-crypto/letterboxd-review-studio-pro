@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * LETTERBOXD STUDIO ULTRA — API KEYS & CONFIGURATION FILE (js/config.js)
+ * LUMIÈRE ATELIER — API KEYS & CONFIGURATION FILE (js/config.js)
  * ============================================================================
  * حط مفاتيح الـ API ديالك هنا بين علامات التنصيص ("") وسجّل الملف!
  */

@@ -131,7 +131,7 @@
       const box = document.getElementById("toastBox");
       box.textContent = msg;
       box.className = `fixed bottom-5 left-5 z-50 px-5 py-3 rounded-2xl font-black text-xs shadow-2xl transition-all ${
-        isWarning ? "bg-amber-400 text-black" : "bg-lb-green text-black"
+        isWarning ? "bg-amber-400 text-black" : "bg-lx-teal text-black"
       }`;
       box.classList.remove("hidden");
       setTimeout(() => box.classList.add("hidden"), 3400);
@@ -207,9 +207,9 @@
       const hasTmdb = !!getActiveKey("TMDB_API_KEY");
       const badge = document.getElementById("apiStatusBadge");
       if (hasFanart && hasTmdb) {
-        badge.className = "w-2.5 h-2.5 rounded-full bg-lb-green shadow-[0_0_8px_#00e054]";
+        badge.className = "w-2.5 h-2.5 rounded-full bg-lx-teal shadow-[0_0_8px_#2dd4bf]";
       } else if (hasFanart || hasTmdb) {
-        badge.className = "w-2.5 h-2.5 rounded-full bg-lb-blue";
+        badge.className = "w-2.5 h-2.5 rounded-full bg-lx-teal";
       } else {
         badge.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
       }
@@ -260,7 +260,7 @@
       } else {
         const fullStars = "★".repeat(Math.floor(val)) + (val % 1 ? "½" : "");
         badge.textContent = `${fullStars} (${val}/5)`;
-        badge.className = "px-3 py-1 rounded-full text-xs font-mono font-black bg-lb-green/20 text-lb-green border border-lb-green/40";
+        badge.className = "px-3 py-1 rounded-full text-xs font-mono font-black bg-lx-amber/20 text-lx-amber border border-lx-amber/40";
       }
       updateMasterPromptPreview();
     }
@@ -299,7 +299,7 @@
         lbl.textContent = item.label;
 
         const sel = document.createElement("select");
-        sel.className = "bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange";
+        sel.className = "bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral";
         options.forEach(opt => {
           const o = document.createElement("option");
           o.value = opt.val;
@@ -512,7 +512,7 @@
       state.fanartAssets.forEach(asset => {
         const card = document.createElement("button");
         card.type = "button";
-        card.className = "group relative aspect-video rounded-xl overflow-hidden border border-white/15 hover:border-lb-green transition shadow-md";
+        card.className = "group relative aspect-video rounded-xl overflow-hidden border border-white/15 hover:border-lx-teal transition shadow-md";
 
         const img = document.createElement("img");
         img.src = asset.url;
@@ -542,7 +542,7 @@
         document.getElementById(`hubPanel-${t}`).classList.toggle("hidden", t !== tab);
         const btn = document.getElementById(`hubTab-${t}`);
         if (t === tab) {
-          btn.className = "px-3.5 py-1.5 rounded-lg bg-lb-blue text-black font-bold transition";
+          btn.className = "px-3.5 py-1.5 rounded-lg bg-lx-teal text-black font-bold transition";
         } else {
           btn.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition";
         }
@@ -617,10 +617,10 @@
 
     function createMovieCard(movie) {
       const card = document.createElement("div");
-      card.className = "group cursor-pointer rounded-2xl overflow-hidden bg-black/50 border border-white/10 hover:border-lb-green transition flex flex-col shadow-lg";
+      card.className = "group cursor-pointer rounded-2xl overflow-hidden bg-black/50 border border-white/10 hover:border-lx-teal transition flex flex-col shadow-lg";
 
       const imgWrap = document.createElement("div");
-      imgWrap.className = "aspect-[2/3] bg-lb-surface overflow-hidden relative";
+      imgWrap.className = "aspect-[2/3] bg-lx-surface overflow-hidden relative";
       if (movie.posterUrl) {
         const img = document.createElement("img");
         img.src = movie.posterUrl;
@@ -631,7 +631,7 @@
 
       if (movie.rating !== undefined && movie.rating !== null) {
         const rBadge = document.createElement("span");
-        rBadge.className = "absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/85 text-lb-green font-mono text-[11px] font-bold border border-lb-green/40";
+        rBadge.className = "absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/85 text-lx-teal font-mono text-[11px] font-bold border border-lx-teal/40";
         rBadge.textContent = `${movie.rating}★`;
         imgWrap.appendChild(rBadge);
       }
@@ -887,12 +887,12 @@
       filtered.slice(0, 60).forEach(m => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "text-right p-2.5 rounded-xl bg-black/50 border border-white/10 hover:border-lb-green transition flex flex-col justify-between";
+        btn.className = "text-right p-2.5 rounded-xl bg-black/50 border border-white/10 hover:border-lx-teal transition flex flex-col justify-between";
         const t = document.createElement("div");
         t.className = "text-xs font-bold text-white truncate w-full";
         t.textContent = m.title;
         const sub = document.createElement("div");
-        sub.className = "text-[10px] font-mono text-lb-green mt-1";
+        sub.className = "text-[10px] font-mono text-lx-teal mt-1";
         sub.textContent = `${m.year || "—"} • ${m.rating ? m.rating + "★" : "Unrated"}`;
         btn.appendChild(t);
         btn.appendChild(sub);
@@ -1119,7 +1119,7 @@
         const card = document.createElement("div");
         const isSel = state.selectedVariationIndex === idx;
         card.className = `p-3.5 rounded-2xl border transition cursor-pointer space-y-2 ${
-          isSel ? "bg-lb-blue/10 border-lb-blue" : "bg-black/50 border-white/10 hover:border-white/25"
+          isSel ? "bg-lx-teal/10 border-lx-teal" : "bg-black/50 border-white/10 hover:border-white/25"
         }`;
         card.onclick = () => {
           state.selectedVariationIndex = idx;
@@ -1135,7 +1135,7 @@
 
         const copyBtn = document.createElement("button");
         copyBtn.type = "button";
-        copyBtn.className = "text-[11px] font-bold px-2.5 py-1 rounded-lg bg-lb-green text-black";
+        copyBtn.className = "text-[11px] font-bold px-2.5 py-1 rounded-lg bg-lx-teal text-black";
         copyBtn.textContent = "نسخ هاد النسخة 📋";
         copyBtn.onclick = (e) => {
           e.stopPropagation();
@@ -1236,7 +1236,7 @@
         info.appendChild(d);
 
         const copyBtn = document.createElement("button");
-        copyBtn.className = "px-3 py-1.5 rounded-lg bg-lb-green text-black font-bold";
+        copyBtn.className = "px-3 py-1.5 rounded-lg bg-lx-teal text-black font-bold";
         copyBtn.textContent = "نسخ البرومبت";
         copyBtn.onclick = () => {
           navigator.clipboard.writeText(item.prompt);
@@ -1287,7 +1287,7 @@
       // 1. Create js/config.js with dedicated API key slots
       const configJsContent = `/**
  * ============================================================================
- * LETTERBOXD STUDIO ULTRA — API KEYS & CONFIGURATION FILE (js/config.js)
+ * LUMIÈRE ATELIER — API KEYS & CONFIGURATION FILE (js/config.js)
  * ============================================================================
  * حط مفاتيح الـ API ديالك هنا بين علامات التنصيص ("") وسجّل الملف!
  */
@@ -1340,7 +1340,7 @@ const STUDIO_CONFIG = {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Letterboxd Studio Pro — Ultra Cinema Edition</title>
+  <title>Lumière — Cinematic Review Atelier v5.0</title>
   <script src="https://cdn.tailwindcss.com"><\/script>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"><\/script>
@@ -1350,7 +1350,7 @@ const STUDIO_CONFIG = {
       theme: {
         extend: {
           colors: {
-            lb: { bg: '#0b0e13', card: '#14181f', surface: '#1c222d', border: '#283142', text: '#9ab', light: '#f1f5f9', orange: '#ff8000', green: '#00e054', blue: '#40bcf4' }
+            lx: { bg: '#06070d', card: '#10131f', surface: '#171b2b', border: '#262c42', text: '#a8b0c8', light: '#eef1fa', amber: '#ffb454', teal: '#2dd4bf', coral: '#fb7185' }
           },
           fontFamily: { sans: ['Alexandria', 'Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
         }
@@ -1359,7 +1359,7 @@ const STUDIO_CONFIG = {
   <\/script>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="min-h-screen film-grain pb-28 selection:bg-lb-green selection:text-black">
+<body class="min-h-screen film-grain pb-28 selection:bg-lx-teal selection:text-black">
   <div id="ambientBackdrop" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');"></div>
   <div id="ambientOverlay"></div>
 
@@ -1377,13 +1377,13 @@ const STUDIO_CONFIG = {
       const appJsOnly = mainAppScript.replace(/const STUDIO_CONFIG = \{[\s\S]*?\};/, "// STUDIO_CONFIG is loaded from js/config.js");
 
       // 5. Create README.md in Darija & English
-      const readmeMd = `# 🎬 Letterboxd Review Studio Ultra (Fanart.tv & TMDB Edition)
+      const readmeMd = `# 🎬 Lumière — Cinematic Review Atelier (Fanart.tv & TMDB Edition)
 
-مشروع ويب متكامل ومفصول لملفات منظمة لصناعة مراجعات **Letterboxd** احترافية وشخصية بالدارجة المغربية أو الإنگليزية أو الفرنسية.
+أتيليه ويب متكامل وملفات منظمة لصناعة مراجعات **Letterboxd** احترافية وشخصية بالدارجة المغربية أو الإنگليزية أو الفرنسية.
 
 ## 📁 هيكلة الدوسي (Project Structure)
 \`\`\`
-letterboxd-studio-ultra/
+lumiere-atelier/
 ├── index.html        # الصفحة الرئيسية (نقية 100% بلا سكريبتات خارجية محقونة)
 ├── css/
 │   └── styles.css    # تصميم الـ Glassmorphism والخلفيات الديناميكية
@@ -1415,8 +1415,8 @@ letterboxd-studio-ultra/
       const blob = await zip.generateAsync({ type: "blob" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "letterboxd-studio-ultra-project.zip";
+      link.download = "lumiere-atelier-project.zip";
       link.click();
-      showToast("✅ تم تحميل دوسي المشروع الكامل (letterboxd-studio-ultra-project.zip)!");
+      showToast("✅ تم تحميل دوسي المشروع الكامل (lumiere-atelier-project.zip)!");
     }
   
