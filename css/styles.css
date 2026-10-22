@@ -1,0 +1,86 @@
+
+    :root {
+      --dynamic-accent: #00e054;
+    }
+    body {
+      background-color: #090c10;
+      color: #e2e8f0;
+      font-family: 'Alexandria', 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    /* Ambient Dynamic Cinema Backdrop */
+    #ambientBackdrop {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-size: cover;
+      background-position: center 20%;
+      transition: background-image 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+      opacity: 0.28;
+      filter: blur(28px) saturate(1.4);
+      transform: scale(1.08);
+    }
+    #ambientOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 0%, rgba(11, 14, 19, 0.45) 0%, rgba(9, 12, 16, 0.94) 65%, #090c10 100%);
+    }
+    /* Film Grain Texture */
+    .film-grain {
+      background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    /* Glassmorphism Cards */
+    .cinema-glass {
+      background: rgba(20, 24, 31, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .cinema-glass-hover:hover {
+      border-color: rgba(0, 224, 84, 0.35);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 25px rgba(0, 224, 84, 0.08);
+    }
+    /* Hero Showcase Banner */
+    #heroShowcase {
+      background-size: cover;
+      background-position: center 25%;
+      transition: background-image 0.7s ease-in-out;
+    }
+    .hero-vignette {
+      background: linear-gradient(to top, #090c10 5%, rgba(9, 12, 16, 0.82) 50%, rgba(9, 12, 16, 0.35) 100%),
+                  linear-gradient(to left, rgba(9, 12, 16, 0.9) 0%, transparent 60%);
+    }
+    /* Interactive Elements */
+    .pill-btn {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pill-btn:hover {
+      transform: translateY(-2px);
+    }
+    .pill-btn.active-green {
+      background: linear-gradient(135deg, rgba(0, 224, 84, 0.22), rgba(0, 224, 84, 0.08));
+      border-color: #00e054;
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(0, 224, 84, 0.25);
+    }
+    .pill-btn.active-orange {
+      background: linear-gradient(135deg, rgba(255, 128, 0, 0.22), rgba(255, 128, 0, 0.08));
+      border-color: #ff8000;
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(255, 128, 0, 0.25);
+    }
+    .pill-btn.active-blue {
+      background: linear-gradient(135deg, rgba(64, 188, 244, 0.22), rgba(64, 188, 244, 0.08));
+      border-color: #40bcf4;
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(64, 188, 244, 0.25);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #090c10; }
+    ::-webkit-scrollbar-thumb { background: #283142; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #40bcf4; }
+  
