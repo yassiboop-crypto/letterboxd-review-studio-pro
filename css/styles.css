@@ -1,27 +1,28 @@
 /* =====================================================================
-   ✦ LUMIÈRE — Cinematic Review Atelier · Design System v5.0 "Lumière"
+   ✦ CINÉMATIK — Streaming-Grade Movie Review Studio · Design System v6.0
    ---------------------------------------------------------------------
-   Identité nouvelle : encre bleu-nuit profonde + or de projection
-   (ambre), turquoise cinéma, corail chaud. Ambiance : faisceau de
-   projecteur, rails de pellicule, verre fumé, halos lumineux.
+   Nouvelle identité : noir salle-obscur + rouge plateforme (signature),
+   ambre projection, turquoise cinéma, corail chaud. Navigation en
+   assistant (wizard) 5 phases, comme Netflix / Apple TV.
    NOTE : tous les noms de classes structurels restent identiques à
-   index.html / js/app.js (cinema-glass, pill-btn, active-green/orange/
-   blue, hero-vignette, film-grain, reveal…) — rien ne casse.
+   index.html / js/app.js (cinema-glass, pill-btn, hero-vignette,
+   film-grain, reveal…) — rien ne casse.
    ===================================================================== */
 
 :root {
-  --dynamic-accent: #2dd4bf;
+  --dynamic-accent: #e50914;
 
-  /* ── Palette Lumière ─────────────────────────────── */
-  --lx-bg: #06070d;          /* encre nuit           */
-  --lx-bg-raise: #0a0c15;    /* voile élevé          */
-  --lx-card: #10131f;        /* carte fumée          */
-  --lx-surface: #171b2b;     /* surface intermédiaire*/
-  --lx-border: #262c42;      /* bordure bleutée      */
-  --lx-amber: #ffb454;       /* or du projecteur     */
-  --lx-teal: #2dd4bf;        /* turquoise cinéma     */
-  --lx-coral: #fb7185;       /* corail chaud         */
-  --lx-purple: #a78bfa;      /* violet créatif       */
+  /* ── Palette CINÉMATIK ───────────────────────────── */
+  --lx-bg: #08090f;          /* noir salle obscure      */
+  --lx-bg-raise: #0c0e17;    /* voile élevé             */
+  --lx-card: #12141f;        /* carte fumée             */
+  --lx-surface: #191c2a;     /* surface intermédiaire   */
+  --lx-border: #282e44;      /* bordure bleutée         */
+  --lx-red: #e50914;         /* rouge plateforme        */
+  --lx-amber: #ffb454;       /* or du projecteur        */
+  --lx-teal: #37d9c8;        /* turquoise cinéma        */
+  --lx-coral: #ff6b81;       /* corail chaud            */
+  --lx-purple: #a78bfa;      /* violet créatif          */
 
   /* Compatibilité avec l'ancien vocabulaire (mêmes rôles) */
   --lb-border: var(--lx-border);
@@ -31,17 +32,18 @@
   --lb-bg: var(--lx-bg);
 
   /* Texte */
-  --text-hi: #eef1fa;
+  --text-hi: #f0f2fa;
   --text-md: #c3cadb;
   --text-lo: #8792ab;
 
   /* Élévation */
-  --shadow-sm: 0 2px 10px rgba(3, 4, 10, 0.45);
-  --shadow-md: 0 12px 34px rgba(3, 4, 10, 0.55);
-  --shadow-lg: 0 28px 70px rgba(2, 3, 8, 0.7);
-  --ring-focus: 0 0 0 3px rgba(45, 212, 191, 0.35);
+  --shadow-sm: 0 2px 10px rgba(3, 4, 10, 0.5);
+  --shadow-md: 0 12px 34px rgba(3, 4, 10, 0.6);
+  --shadow-lg: 0 28px 70px rgba(2, 3, 8, 0.75);
+  --ring-focus: 0 0 0 3px rgba(229, 9, 20, 0.35);
   --glow-amber: 0 0 26px rgba(255, 180, 84, 0.30);
-  --glow-teal: 0 0 26px rgba(45, 212, 191, 0.25);
+  --glow-teal: 0 0 26px rgba(55, 217, 200, 0.25);
+  --glow-red: 0 0 26px rgba(229, 9, 20, 0.35);
 
   /* Motion */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
@@ -64,22 +66,34 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-::selection { background: rgba(45, 212, 191, 0.35); color: #fff; }
+::selection { background: rgba(55, 217, 200, 0.35); color: #fff; }
 
-/* ---------- Marque : typographie Lumière ---------- */
+/* ---------- Marque : typographie CINÉMATIK ---------- */
 .brand-word {
   font-weight: 900;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
   color: var(--text-hi);
   line-height: 1;
 }
 .brand-e {
-  background: linear-gradient(120deg, var(--lx-amber), var(--lx-coral));
+  background: linear-gradient(120deg, var(--lx-red), var(--lx-amber));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-.brand-dot { color: var(--lx-teal); }
+.brand-dot { color: var(--lx-red); }
+.cinetik-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 35% 30%, rgba(229, 9, 20, 0.18), rgba(8, 9, 15, 0.92) 70%);
+  border: 1px solid rgba(229, 9, 20, 0.4);
+  box-shadow: var(--glow-red), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: lumenBreathe 5s ease-in-out infinite;
+}
 .lumen-badge {
   display: flex;
   align-items: center;
@@ -221,7 +235,7 @@ body::before {
   transform: translateY(-1px);
 }
 .cinema-glass-hover:hover {
-  border-color: rgba(45, 212, 191, 0.35);
+  border-color: rgba(55, 217, 200, 0.35);
   box-shadow: var(--shadow-lg), 0 0 28px rgba(45, 212, 191, 0.10);
 }
 
@@ -330,7 +344,7 @@ input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.25); }
 }
 #searchResultsGrid > *:hover, #rssResultsGrid > *:hover {
   transform: translateY(-4px) scale(1.015);
-  box-shadow: var(--shadow-md), 0 0 0 1px rgba(45, 212, 191, 0.35);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(55, 217, 200, 0.35);
 }
 #csvResultsGrid > *:hover {
   transform: translateY(-2px);
@@ -414,4 +428,105 @@ a:focus-visible, [role="button"]:focus-visible {
   #ambientBackdrop { filter: blur(22px) saturate(1.25) brightness(0.7); }
   #projectorBeam { display: none; }
   .cinema-glass { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ✦ CINÉMATIK WIZARD — 5 phases, navigation façon Netflix / Apple TV
+   ═══════════════════════════════════════════════════════════════════ */
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* --- Steps pills in the wizard nav --- */
+.wiz-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-lo);
+  cursor: pointer;
+  transition: all 0.35s var(--ease-out-quint);
+  white-space: nowrap;
+  text-align: start;
+}
+.wiz-step:hover { color: var(--text-hi); background: rgba(255, 255, 255, 0.05); }
+.wiz-step .wiz-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-weight: 900;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-lo);
+  transition: all 0.35s var(--ease-spring);
+  flex-shrink: 0;
+}
+.wiz-step .wiz-txt { display: flex; flex-direction: column; line-height: 1.15; }
+.wiz-step .wiz-txt b { font-size: 12.5px; font-weight: 800; }
+.wiz-step .wiz-txt small { font-size: 10px; opacity: 0.75; font-weight: 500; }
+
+.wiz-step.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.22), rgba(229, 9, 20, 0.08));
+  border-color: rgba(229, 9, 20, 0.55);
+  box-shadow: var(--glow-red);
+}
+.wiz-step.is-active .wiz-num {
+  background: var(--lx-red);
+  border-color: var(--lx-red);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(229, 9, 20, 0.6);
+  transform: scale(1.05);
+}
+.wiz-step.is-done { color: var(--text-md); }
+.wiz-step.is-done .wiz-num {
+  background: rgba(55, 217, 200, 0.15);
+  border-color: rgba(55, 217, 200, 0.5);
+  color: var(--lx-teal);
+}
+.wiz-step.is-done .wiz-num::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.wiz-step.is-done .wiz-num { font-size: 0; } /* hide digit, show check */
+
+.wiz-sep {
+  align-self: center;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05));
+  flex-shrink: 0;
+}
+
+/* --- Panels : apparition en fondu + glissement (Apple TV style) --- */
+.wiz-panel { animation: wizEnter 0.55s var(--ease-out-quint) both; }
+.wiz-panel.hidden { display: none !important; }
+
+@keyframes wizEnter {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Progress bar under header glow --- */
+#wizardProgressBar { opacity: 0.95; }
+
+@media (max-width: 768px) {
+  .wiz-step .wiz-txt small { display: none; }
+  .wiz-step { padding: 7px 10px; }
+  .wiz-sep { width: 12px; }
 }

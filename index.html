@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lumière — Cinematic Review Atelier v5.0</title>
-  <meta name="description" content="Lumière: atelier سينمائي احترافي لصناعة مراجعات الأفلام بالدارجة — Fanart.tv & TMDB Visual Engine + Writing DNA" />
+  <title>CINÉMATIK — Streaming-Grade Movie Review Studio v6.0</title>
+  <meta name="description" content="CINÉMATIK: ستوديو احترافي بصلة Netflix/Apple TV لصناعة مراجعات الأفلام بالدارجة — بحث، تقييم، تحليل، ومراجعة AI فمراحل واضحة" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -14,7 +14,7 @@
       theme: {
         extend: {
           colors: {
-            lx: { bg: '#06070d', card: '#10131f', surface: '#171b2b', border: '#262c42', text: '#a8b0c8', light: '#eef1fa', amber: '#ffb454', teal: '#2dd4bf', coral: '#fb7185' }
+            lx: { bg: '#08090f', card: '#12141f', surface: '#191c2a', border: '#282e44', text: '#aab2c8', light: '#f0f2fa', amber: '#ffb454', teal: '#37d9c8', coral: '#ff6b81', red: '#e50914' }
           },
           fontFamily: { sans: ['Alexandria', 'Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
         }
@@ -31,32 +31,34 @@
   <div class="filmstrip-rail rail-start" aria-hidden="true"></div>
   <div class="filmstrip-rail rail-end" aria-hidden="true"></div>
 
-  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#06070d]/85 backdrop-blur-xl">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#08090f]/90 backdrop-blur-xl">
+    <!-- Netflix-style red progress bar reflecting wizard completion -->
+    <div id="wizardProgressBar" class="absolute bottom-0 right-0 h-[3px] bg-gradient-to-l from-lx-red via-lx-red to-lx-amber transition-all duration-700 shadow-[0_0_12px_rgba(229,9,20,0.8)]" style="width:0%"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-      <!-- Brand Logo -->
+      <!-- Brand Logo : CINÉMATIK -->
       <div class="flex items-center gap-3">
-        <div class="lumen-badge" title="Lumière — projection de lumière">
-          <svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">
+        <div class="cinetik-badge" title="CINÉMATIK — Streaming-Grade Review Studio" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="34" height="34">
             <defs>
-              <linearGradient id="lumenGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#ffb454"/>
-                <stop offset="55%" stop-color="#fb7185"/>
-                <stop offset="100%" stop-color="#2dd4bf"/>
+              <linearGradient id="cinetikGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#e50914"/>
+                <stop offset="60%" stop-color="#ff6b81"/>
+                <stop offset="100%" stop-color="#ffb454"/>
               </linearGradient>
             </defs>
-            <circle cx="20" cy="20" r="16.5" fill="none" stroke="url(#lumenGrad)" stroke-width="2.4"/>
-            <path d="M20 8 L20 20 L30.4 26" fill="none" stroke="url(#lumenGrad)" stroke-width="2.4" stroke-linecap="round"/>
-            <circle cx="20" cy="20" r="2.6" fill="#ffb454"/>
+            <rect x="4" y="4" width="32" height="32" rx="9" fill="none" stroke="url(#cinetikGrad)" stroke-width="2.6"/>
+            <path d="M15 12.5 L15 27.5 M25 12.5 L25 27.5" stroke="url(#cinetikGrad)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M15 12.5 L25 27.5" stroke="url(#cinetikGrad)" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
           </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="brand-word text-xl sm:text-2xl">
-              Lumi<span class="brand-e">è</span>re<span class="brand-dot">.</span>
+              CIN<span class="brand-e">É</span>MATIK<span class="brand-dot">.</span>
             </h1>
-            <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-lx-teal/15 text-lx-teal border border-lx-teal/30">v5.0 Atelier Edition</span>
+            <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-lx-red/15 text-red-300 border border-lx-red/40">v6.0 Studio</span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">أتيليه صناعة المراجعات السينمائية بالدارجة • Fanart.tv &amp; TMDB Visual Engine • Writing DNA</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">ستوديو المراجعات على طريقة المنصات الكبرى • قلّب على الفيلم ← قيّم ← حلّل ← راجع</p>
         </div>
       </div>
 
@@ -88,9 +90,48 @@
       </div>
     </div>
   </header>
-<main class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 space-y-6">
+
+  <!-- ═══ CINÉMATIK WIZARD : 5 étapes façon Netflix/Apple TV ═══ -->
+  <nav id="wizardNav" aria-label="مراحل صناعة المراجعة" class="cinema-glass rounded-2xl px-3 py-3.5 sm:px-5">
+    <div class="flex items-stretch gap-1 overflow-x-auto no-scrollbar">
+      <button type="button" onclick="goToStep(1)" data-step-btn="1" class="wiz-step is-active">
+        <span class="wiz-num">1</span>
+        <span class="wiz-txt"><b>قلّب على الفيلم</b><small>بحث · بوستر · Fanart</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(2)" data-step-btn="2" class="wiz-step">
+        <span class="wiz-num">2</span>
+        <span class="wiz-txt"><b>قيّم</b><small>نجمات · سياق</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(3)" data-step-btn="3" class="wiz-step">
+        <span class="wiz-num">3</span>
+        <span class="wiz-txt"><b>حلّل</b><small>10 عناصر · Vibe</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(4)" data-step-btn="4" class="wiz-step">
+        <span class="wiz-num">4</span>
+        <span class="wiz-txt"><b>اضبط</b><small>النبرة · الـ AI</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(5)" data-step-btn="5" class="wiz-step">
+        <span class="wiz-num">5</span>
+        <span class="wiz-txt"><b>راجع وصدّر</b><small>Mreview · ZIP</small></span>
+      </button>
+    </div>
+    <div class="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+      <div class="text-[11px] text-slate-400 font-mono" id="wizardHint">▶ المرحلة 1 من 5 — قلب أولًا على الفيلم، وكلشي غادي يتلوقا أوتوماتيكياً</div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="prevStep()" class="pill-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-slate-300 hover:text-white transition">→ السابق</button>
+        <button onclick="nextStep()" class="pill-btn text-xs font-black px-4 py-1.5 rounded-xl bg-lx-red text-white shadow-[0_0_18px_rgba(229,9,20,0.45)] hover:brightness-110 transition">التالي ←</button>
+      </div>
+    </div>
+  </nav>
+
 
     <!-- 1. DYNAMIC CINEMA HERO STAGE (FANART.TV & TMDB SHOWCASE) -->
+    <div class="wiz-panel" data-step="1">
     <section id="heroShowcase" class="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[320px] sm:min-h-[360px] flex flex-col justify-end" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&amp;w=1920&amp;auto=format&amp;fit=crop');">
       <div class="hero-vignette absolute inset-0"></div>
 
@@ -183,7 +224,7 @@
     <section class="cinema-glass rounded-3xl p-5 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-5 border-b border-white/10 pb-4">
         <div class="flex items-center gap-2.5">
-          <span class="w-8 h-8 rounded-xl bg-lx-teal/15 border border-lx-teal/30 flex items-center justify-center text-lx-teal font-bold">1</span>
+          <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">1</span>
           <div>
             <h2 class="text-base sm:text-lg font-extrabold text-white">مركز البحث والمزامنة الذكي (Smart Film &amp; Fanart Hub)</h2>
             <p class="text-xs text-slate-400">قلب على أي فيلم باش يجبد ليك البوستر، المخرج، والخلفيات ديال Fanart.tv أوتوماتيكياً</p>
@@ -257,6 +298,11 @@
       </div>
     </section>
 
+    </div><!-- ═══ FIN PHASE 1 ═══ -->
+
+    <!-- ═══ PHASE 2 : التقييم (يغلف الـ Grid كامل: يسار=مراحل 2-3، يمين=مراحل 4-5) ═══ -->
+    <div class="wiz-panel hidden" data-step="2">
+
     <!-- MAIN WORKSPACE GRID (2 Columns on Desktop) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -267,7 +313,7 @@
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-5">
           <div class="flex items-center justify-between border-b border-white/10 pb-3">
             <div class="flex items-center gap-2.5">
-              <span class="w-8 h-8 rounded-xl bg-lx-teal/15 border border-lx-teal/30 flex items-center justify-center text-lx-teal font-bold">2</span>
+              <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">2</span>
               <div>
                 <h2 class="text-base sm:text-lg font-extrabold text-white">التقييم وسياق المشاهدة (Rating &amp; Context)</h2>
                 <p class="text-xs text-slate-400">الاختيارات كتبدا محايدة (Neutral) باش ما يتأثرش البرومبت بشي حاجة ما ختاريتيهاش</p>
@@ -312,11 +358,16 @@
           </div>
         </section>
 
+        </div><!-- ═══ FIN PHASE 2 ═══ -->
+
+        <!-- ═══ PHASE 3 : التحليل ═══ -->
+        <div class="wiz-panel hidden" data-step="3">
+
         <!-- 4. CINEMATIC ANALYSIS MATRIX (10 Elements with "No Opinion" Default) -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
             <div class="flex items-center gap-2.5">
-              <span class="w-8 h-8 rounded-xl bg-lx-coral/15 border border-lx-coral/30 flex items-center justify-center text-lx-coral font-bold">3</span>
+              <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">3</span>
               <div>
                 <h2 class="text-base sm:text-lg font-extrabold text-white">التحليل السينمائي المفصل (Cinematic Breakdown)</h2>
                 <p class="text-xs text-slate-400">قيّم غير العناصر اللي بغيتي تهضر عليها، وخلي الباقي "ما عنديش رأي"</p>
@@ -340,7 +391,7 @@
         <!-- 5. VIBE TAGS & PERSONAL SOUL (What makes the review YOURS) -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-5">
           <div class="flex items-center gap-2.5 border-b border-white/10 pb-3">
-            <span class="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold">4</span>
+            <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">4</span>
             <div>
               <h2 class="text-base sm:text-lg font-extrabold text-white">الـ Vibe واللمسة الشخصية ديالك (Personal Touch)</h2>
               <p class="text-xs text-slate-400">هاد التفاصيل هي اللي كتخلي المراجعة خارجة من قلبك وماشي ملخص ويكيبيديا</p>
@@ -371,15 +422,22 @@
           </div>
         </section>
 
+        </div><!-- ═══ FIN PHASE 3 ═══ -->
+
+        <!-- ═══ PHASE 4+5 panels live in the sticky right column below ═══ -->
+
       </div>
 
       <!-- LEFT COLUMN (5 Cols): Advanced Controls, Master Prompt, & Live AI Review Studio -->
       <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-20">
 
+        <div class="wiz-panel hidden" data-step="4">
+
         <!-- 6. ADVANCED REVIEW CONTROLS & PRESETS -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-white/10 pb-3">
             <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black shrink-0">5</span>
               <span>🎛️</span>
               <span>إعدادات الأسلوب والنبرة (Style &amp; Sliders)</span>
             </h2>
@@ -460,6 +518,9 @@
           </div>
         </section>
 
+        </div><!-- ═══ FIN PHASE 4 ═══ -->
+
+        <div class="wiz-panel hidden" data-step="5">
         <!-- 7. MASTER PROMPT & IN-APP AI REVIEW STUDIO -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-2 border-t-lx-teal">
           <div class="flex items-center justify-between">
@@ -531,8 +592,10 @@
           </div>
         </section>
 
-      </div>
-    </div>
+      </div><!-- ═══ FIN PHASE 5 ═══ -->
+    </div><!-- /lg:col-span-5 -->
+    </div><!-- /workspace grid -->
+    </div><!-- ═══ FIN PHASE 2 wrapper (phases 2→5) ═══ -->
   </main>
 <div id="apiModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="cinema-glass rounded-3xl max-w-xl w-full p-6 space-y-5 border border-white/20 max-h-[90vh] overflow-y-auto">

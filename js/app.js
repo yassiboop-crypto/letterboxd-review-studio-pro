@@ -76,7 +76,94 @@
       renderJournalCount();
       updateMasterPromptPreview();
       initDesignEnhancements();
+      initCinematikWizard();
     });
+
+    /* ══════════════════════════════════════════════════════════════
+       CINÉMATIK WIZARD — 5 phases façon Netflix / Apple TV
+       (vissage visuel : ما كيبدل والو فـ الـ logic ولا الـ IDs)
+       ══════════════════════════════════════════════════════════════ */
+    let wizCurrentStep = 1;
+    const WIZ_TOTAL_STEPS = 5;
+    const WIZ_HINTS = {
+      1: "▶ المرحلة 1 من 5 — قلب أولًا على الفيلم (بحث · RSS · CSV)، البوستر والخلفيات كتجي أوتوماتيكياً",
+      2: "▶ المرحلة 2 من 5 — عطي النجمات ديالك وحدد سياق المشاهدة (كلشي اختياري ومحايد بالبداية)",
+      3: "▶ المرحلة 3 من 5 — حلّل العناصر اللي عاجباك، وضيف tags الـ Vibe والفكرة الحرة ديالك",
+      4: "▶ المرحلة 4 من 5 — اضبط النبرة، الطول، اللغة، والـ Sliders ديال الـ AI",
+      5: "▶ المرحلة 5 من 5 — ولّد المراجعة، عدّل النسخ، وصدّر كلشي (Markdown · ZIP)"
+    };
+
+    function isPhaseComplete(step) {
+      switch (step) {
+        case 1: return !!(state.film.title && state.film.title.trim());
+        case 2: return state.rating !== null || state.liked;
+        case 3: return Object.keys(state.elements).length > 0 || state.vibes.size > 0;
+        case 4: return true; // réglages toujours valides (neutres par défaut)
+        case 5: return state.generatedVariations.length > 0;
+        default: return false;
+      }
+    }
+
+    function goToStep(n, opts = {}) {
+      n = Math.max(1, Math.min(WIZ_TOTAL_STEPS, n));
+      wizCurrentStep = n;
+
+      // Panels visibility + relance de l'animation d'entrée
+      document.querySelectorAll(".wiz-panel").forEach((p) => {
+        const active = Number(p.dataset.step) === n;
+        p.classList.toggle("hidden", !active);
+        if (active && !opts.silent) {
+          p.style.animation = "none";
+          void p.offsetWidth; // reflow
+          p.style.animation = "";
+        }
+      });
+
+      // Step buttons states
+      for (let i = 1; i <= WIZ_TOTAL_STEPS; i++) {
+        const btn = document.querySelector(`[data-step-btn="${i}"]`);
+        if (!btn) continue;
+        btn.classList.toggle("is-active", i === n);
+        btn.classList.toggle("is-done", i < n && isPhaseComplete(i));
+      }
+
+      // Hint + progress bar (Netflix-style red bar)
+      const hint = document.getElementById("wizardHint");
+      if (hint) hint.textContent = WIZ_HINTS[n];
+      const doneCount = Array.from({ length: WIZ_TOTAL_STEPS }, (_, k) => k + 1).filter(isPhaseComplete).length;
+      const pct = Math.round(((doneCount + (n - 1)) / (WIZ_TOTAL_STEPS * 2 - 1)) * 100);
+      const bar = document.getElementById("wizardProgressBar");
+      if (bar) bar.style.width = `${Math.min(100, pct)}%`;
+
+      // Scroll to wizard nav top (sauf au chargement silencieux)
+      if (!opts.silent) {
+        const nav = document.getElementById("wizardNav");
+        if (nav) nav.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function nextStep() {
+      // Guide l'utilisateur : si phase courante incomplète, on le lui dit joliment
+      if (!isPhaseComplete(wizCurrentStep) && wizCurrentStep < WIZ_TOTAL_STEPS) {
+        const msgs = {
+          1: "⚠️ قلب أولًا على الفيلم ولا كتب سميته يدوياً فالبوكس ديال فوق قبل ما تكمل!",
+          2: "💡 نصيحة: عطي غير نجمة ولا Liked قبل ما تمشي للمرحلة الجاية (ولا تجاوز إلا بغيتي).",
+          3: "💡 حلّل عنصر واحد على الأقل ولا ضيف tag ديال الـ Vibe باش تخرج المراجعة بشخصيتك."
+        };
+        showToast(msgs[wizCurrentStep] || "كمّل هاد المرحلة ولا تجاوزها.", true);
+      }
+      goToStep(wizCurrentStep + 1);
+    }
+
+    function prevStep() { goToStep(wizCurrentStep - 1); }
+
+    function initCinematikWizard() {
+      goToStep(1, { silent: true });
+      // Refresh des états à chaque interaction (rating, vibes, sélection film…)
+      document.addEventListener("click", () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true })));
+      document.addEventListener("change", () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true })));
+      document.addEventListener("input", () => requestAnimationFrame(() => goToStep(wizCurrentStep, { silent: true })));
+    }
 
     /* ---- UI v4.1 "Aurora Cinema" design enhancements (visual-only) ---- */
     function initDesignEnhancements() {
@@ -657,6 +744,8 @@
     }
 
     async function selectMovieFromHub(movie) {
+      // CINÉMATIK : après sélection du film, on enchaîne automatiquement vers la phase 2
+      setTimeout(() => goToStep(2), 450);
       document.getElementById("filmTitle").value = movie.title || "";
       document.getElementById("filmYear").value = movie.year || "";
       document.getElementById("filmDirector").value = movie.director || "";
@@ -1268,7 +1357,8 @@
       renderVibeChips();
       setRating(null);
       updateMasterPromptPreview();
-      showToast("🔄 تم تصفير الاستمارة بنجاح!");
+      goToStep(1);
+      showToast("🔄 تم تصفير الاستمارة — رجع للمرحلة 1 وقلب على فيلم جديد!");
     }
 
     /**************************************************************
