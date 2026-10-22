@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Letterboxd Studio Pro — Ultra Cinema Edition</title>
+  <title>CINÉMATIK — Streaming-Grade Movie Review Studio v6.0</title>
+  <meta name="description" content="CINÉMATIK: ستوديو احترافي بصلة Netflix/Apple TV لصناعة مراجعات الأفلام بالدارجة — بحث، تقييم، تحليل، ومراجعة AI فمراحل واضحة" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -13,7 +14,7 @@
       theme: {
         extend: {
           colors: {
-            lb: { bg: '#0b0e13', card: '#14181f', surface: '#1c222d', border: '#283142', text: '#9ab', light: '#f1f5f9', orange: '#ff8000', green: '#00e054', blue: '#40bcf4' }
+            lx: { bg: '#08090f', card: '#12141f', surface: '#191c2a', border: '#282e44', text: '#aab2c8', light: '#f0f2fa', amber: '#ffb454', teal: '#37d9c8', coral: '#ff6b81', red: '#e50914' }
           },
           fontFamily: { sans: ['Alexandria', 'Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
         }
@@ -22,34 +23,49 @@
   </script>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="min-h-screen film-grain pb-28 selection:bg-lb-green selection:text-black">
+<body class="min-h-screen film-grain pb-28 selection:bg-lx-teal selection:text-black">
   <div id="ambientBackdrop" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');"></div>
   <div id="ambientOverlay"></div>
+  <!-- Lumière ambient light: projector beam + filmstrip rails -->
+  <div id="projectorBeam" aria-hidden="true"></div>
+  <div class="filmstrip-rail rail-start" aria-hidden="true"></div>
+  <div class="filmstrip-rail rail-end" aria-hidden="true"></div>
 
-  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#090c10]/80 backdrop-blur-xl">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#08090f]/90 backdrop-blur-xl">
+    <!-- Netflix-style red progress bar reflecting wizard completion -->
+    <div id="wizardProgressBar" class="absolute bottom-0 right-0 h-[3px] bg-gradient-to-l from-lx-red via-lx-red to-lx-amber transition-all duration-700 shadow-[0_0_12px_rgba(229,9,20,0.8)]" style="width:0%"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-      <!-- Brand Logo -->
+      <!-- Brand Logo : CINÉMATIK -->
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-1.5 bg-black/50 px-3 py-2 rounded-full border border-white/10 shadow-inner">
-          <span class="w-3.5 h-3.5 rounded-full bg-[#ff8000] shadow-[0_0_10px_#ff8000]"></span>
-          <span class="w-3.5 h-3.5 rounded-full bg-[#00e054] shadow-[0_0_10px_#00e054]"></span>
-          <span class="w-3.5 h-3.5 rounded-full bg-[#40bcf4] shadow-[0_0_10px_#40bcf4]"></span>
+        <div class="cinetik-badge" title="CINÉMATIK — Streaming-Grade Review Studio" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="34" height="34">
+            <defs>
+              <linearGradient id="cinetikGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#e50914"/>
+                <stop offset="60%" stop-color="#ff6b81"/>
+                <stop offset="100%" stop-color="#ffb454"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="32" height="32" rx="9" fill="none" stroke="url(#cinetikGrad)" stroke-width="2.6"/>
+            <path d="M15 12.5 L15 27.5 M25 12.5 L25 27.5" stroke="url(#cinetikGrad)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M15 12.5 L25 27.5" stroke="url(#cinetikGrad)" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+          </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg sm:text-xl font-black tracking-tight text-white">
-              LETTERBOXD <span class="text-transparent bg-clip-text bg-gradient-to-l from-lb-green via-lb-blue to-lb-orange">STUDIO ULTRA</span>
+            <h1 class="brand-word text-xl sm:text-2xl">
+              CIN<span class="brand-e">É</span>MATIK<span class="brand-dot">.</span>
             </h1>
-            <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-lb-green/15 text-lb-green border border-lb-green/30">v4.0 Fanart Edition</span>
+            <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-lx-red/15 text-red-300 border border-lx-red/40">v6.0 Studio</span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">منصة صناعة المراجعات السينمائية بالدارجة • Fanart.tv &amp; TMDB Visual Engine • Writing DNA</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">ستوديو المراجعات على طريقة المنصات الكبرى • قلّب على الفيلم ← قيّم ← حلّل ← راجع</p>
         </div>
       </div>
 
       <!-- Top Action Controls -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- API Keys Vault Button -->
-        <button onclick="toggleModal('apiModal')" class="pill-btn flex items-center gap-2 text-xs font-bold px-3.5 py-2 rounded-xl bg-lb-surface/90 hover:bg-lb-surface text-white border border-white/15 shadow-lg">
+        <button onclick="toggleModal('apiModal')" class="pill-btn flex items-center gap-2 text-xs font-bold px-3.5 py-2 rounded-xl bg-lx-surface/90 hover:bg-lx-surface text-white border border-white/15 shadow-lg">
           <span>🔑</span>
           <span>مفاتيح الـ API</span>
           <span id="apiStatusBadge" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -62,7 +78,7 @@
         </button>
 
         <!-- Export Full Project Folder (.ZIP) -->
-        <button onclick="downloadFullProjectZip()" class="pill-btn flex items-center gap-2 text-xs font-black px-4 py-2 rounded-xl bg-gradient-to-r from-lb-green to-emerald-400 text-black shadow-[0_0_20px_rgba(0,224,84,0.3)]">
+        <button onclick="downloadFullProjectZip()" class="pill-btn flex items-center gap-2 text-xs font-black px-4 py-2 rounded-xl bg-gradient-to-r from-lx-amber to-orange-400 text-black shadow-[0_0_20px_rgba(255,180,84,0.35)]">
           <span>📦</span>
           <span>تحميل دوسي المشروع (.ZIP)</span>
         </button>
@@ -74,16 +90,55 @@
       </div>
     </div>
   </header>
-<main class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 space-y-6">
+
+  <!-- ═══ CINÉMATIK WIZARD : 5 étapes façon Netflix/Apple TV ═══ -->
+  <nav id="wizardNav" aria-label="مراحل صناعة المراجعة" class="cinema-glass rounded-2xl px-3 py-3.5 sm:px-5">
+    <div class="flex items-stretch gap-1 overflow-x-auto no-scrollbar">
+      <button type="button" onclick="goToStep(1)" data-step-btn="1" class="wiz-step is-active">
+        <span class="wiz-num">1</span>
+        <span class="wiz-txt"><b>قلّب على الفيلم</b><small>بحث · بوستر · Fanart</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(2)" data-step-btn="2" class="wiz-step">
+        <span class="wiz-num">2</span>
+        <span class="wiz-txt"><b>قيّم</b><small>نجمات · سياق</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(3)" data-step-btn="3" class="wiz-step">
+        <span class="wiz-num">3</span>
+        <span class="wiz-txt"><b>حلّل</b><small>10 عناصر · Vibe</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(4)" data-step-btn="4" class="wiz-step">
+        <span class="wiz-num">4</span>
+        <span class="wiz-txt"><b>اضبط</b><small>النبرة · الـ AI</small></span>
+      </button>
+      <span class="wiz-sep" aria-hidden="true"></span>
+      <button type="button" onclick="goToStep(5)" data-step-btn="5" class="wiz-step">
+        <span class="wiz-num">5</span>
+        <span class="wiz-txt"><b>راجع وصدّر</b><small>Mreview · ZIP</small></span>
+      </button>
+    </div>
+    <div class="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+      <div class="text-[11px] text-slate-400 font-mono" id="wizardHint">▶ المرحلة 1 من 5 — قلب أولًا على الفيلم، وكلشي غادي يتلوقا أوتوماتيكياً</div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="prevStep()" class="pill-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-slate-300 hover:text-white transition">→ السابق</button>
+        <button onclick="nextStep()" class="pill-btn text-xs font-black px-4 py-1.5 rounded-xl bg-lx-red text-white shadow-[0_0_18px_rgba(229,9,20,0.45)] hover:brightness-110 transition">التالي ←</button>
+      </div>
+    </div>
+  </nav>
+
 
     <!-- 1. DYNAMIC CINEMA HERO STAGE (FANART.TV & TMDB SHOWCASE) -->
+    <div class="wiz-panel" data-step="1">
     <section id="heroShowcase" class="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[320px] sm:min-h-[360px] flex flex-col justify-end" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&amp;w=1920&amp;auto=format&amp;fit=crop');">
       <div class="hero-vignette absolute inset-0"></div>
 
       <!-- Top Floating Badges inside Hero -->
       <div class="relative z-10 p-5 sm:p-7 flex flex-wrap items-center justify-between gap-2 mb-auto">
         <div class="flex items-center gap-2 flex-wrap">
-          <span id="heroSourceBadge" class="text-[11px] font-mono uppercase px-3 py-1 rounded-full bg-black/70 text-lb-blue border border-lb-blue/30 backdrop-blur-md">
+          <span id="heroSourceBadge" class="text-[11px] font-mono uppercase px-3 py-1 rounded-full bg-black/70 text-lx-teal border border-lx-teal/30 backdrop-blur-md">
             🎬 Ready for Film Selection
           </span>
           <span id="fanartStatusPill" class="text-[11px] font-mono px-3 py-1 rounded-full bg-black/70 text-purple-300 border border-purple-500/30 backdrop-blur-md hidden">
@@ -95,7 +150,7 @@
           <button onclick="openFanartDrawer()" class="text-xs font-bold px-3.5 py-1.5 rounded-full bg-black/75 hover:bg-black text-white border border-white/20 backdrop-blur-md transition flex items-center gap-1.5">
             <span>🖼️</span>
             <span>معرض الخلفيات (Fanart.tv)</span>
-            <span id="fanartCountBadge" class="bg-lb-orange text-black px-1.5 py-0.2 rounded-full text-[10px] font-black">0</span>
+            <span id="fanartCountBadge" class="bg-lx-coral text-black px-1.5 py-0.2 rounded-full text-[10px] font-black">0</span>
           </button>
         </div>
       </div>
@@ -104,7 +159,7 @@
       <div class="relative z-10 p-5 sm:p-8 pt-0 flex flex-col sm:flex-row items-center sm:items-end gap-6">
         <!-- High-Res Poster Card with 3D Tilt Hover -->
         <div class="relative group shrink-0">
-          <div class="w-32 sm:w-40 aspect-[2/3] rounded-2xl overflow-hidden border-2 border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.9)] bg-lb-card flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.03]">
+          <div class="w-32 sm:w-40 aspect-[2/3] rounded-2xl overflow-hidden border-2 border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.9)] bg-lx-card flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.03]">
             <img id="heroPosterImg" src="" alt="Film Poster" class="w-full h-full object-cover hidden">
             <div id="heroPosterPlaceholder" class="text-center p-4">
               <span class="text-4xl block mb-2">🎞️</span>
@@ -129,15 +184,15 @@
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
             <div class="sm:col-span-6">
               <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">سمية الفيلم (Film Title) *</label>
-              <input id="filmTitle" type="text" placeholder="مثال: A Clockwork Orange / La Haine..." oninput="syncHeroDisplay()" class="w-full bg-black/65 hover:bg-black/80 focus:bg-black/90 backdrop-blur-md border border-white/15 focus:border-lb-green rounded-xl px-4 py-2.5 text-white font-bold text-base focus:outline-none transition">
+              <input id="filmTitle" type="text" placeholder="مثال: A Clockwork Orange / La Haine..." oninput="syncHeroDisplay()" class="w-full bg-black/65 hover:bg-black/80 focus:bg-black/90 backdrop-blur-md border border-white/15 focus:border-lx-teal rounded-xl px-4 py-2.5 text-white font-bold text-base focus:outline-none transition">
             </div>
             <div class="sm:col-span-2">
               <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">العام (Year)</label>
-              <input id="filmYear" type="number" placeholder="1971" oninput="syncHeroDisplay()" class="w-full bg-black/65 hover:bg-black/80 focus:bg-black/90 backdrop-blur-md border border-white/15 focus:border-lb-green rounded-xl px-3 py-2.5 text-white font-mono text-center text-base focus:outline-none transition">
+              <input id="filmYear" type="number" placeholder="1971" oninput="syncHeroDisplay()" class="w-full bg-black/65 hover:bg-black/80 focus:bg-black/90 backdrop-blur-md border border-white/15 focus:border-lx-teal rounded-xl px-3 py-2.5 text-white font-mono text-center text-base focus:outline-none transition">
             </div>
             <div class="sm:col-span-4">
               <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">المخرج (Director)</label>
-              <input id="filmDirector" type="text" placeholder="Stanley Kubrick" oninput="syncHeroDisplay()" class="w-full bg-black/65 hover:bg-black/80 focus:bg-black/90 backdrop-blur-md border border-white/15 focus:border-lb-green rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none transition">
+              <input id="filmDirector" type="text" placeholder="Stanley Kubrick" oninput="syncHeroDisplay()" class="w-full bg-black/65 hover:bg-black/80 focus:bg-black/90 backdrop-blur-md border border-white/15 focus:border-lx-teal rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none transition">
             </div>
           </div>
         </div>
@@ -153,8 +208,8 @@
             <p class="text-[11px] text-slate-400">كليكي على أي خلفية باش تطبقها على التطبيق، أولا حط رابط خلفية (URL) من اختيارك.</p>
           </div>
           <div class="flex items-center gap-2">
-            <input id="customBackdropInput" type="url" placeholder="رابط صورة خلفية خارجي (URL)..." class="bg-lb-surface border border-white/15 rounded-lg px-3 py-1 text-xs text-white w-56 focus:outline-none focus:border-lb-blue">
-            <button onclick="applyCustomBackdrop()" class="text-xs font-bold px-3 py-1 rounded-lg bg-lb-blue text-black">تطبيق</button>
+            <input id="customBackdropInput" type="url" placeholder="رابط صورة خلفية خارجي (URL)..." class="bg-lx-surface border border-white/15 rounded-lg px-3 py-1 text-xs text-white w-56 focus:outline-none focus:border-lx-teal">
+            <button onclick="applyCustomBackdrop()" class="text-xs font-bold px-3 py-1 rounded-lg bg-lx-teal text-black">تطبيق</button>
           </div>
         </div>
         <div id="fanartGalleryGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-48 overflow-y-auto p-1">
@@ -169,7 +224,7 @@
     <section class="cinema-glass rounded-3xl p-5 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-5 border-b border-white/10 pb-4">
         <div class="flex items-center gap-2.5">
-          <span class="w-8 h-8 rounded-xl bg-lb-blue/15 border border-lb-blue/30 flex items-center justify-center text-lb-blue font-bold">1</span>
+          <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">1</span>
           <div>
             <h2 class="text-base sm:text-lg font-extrabold text-white">مركز البحث والمزامنة الذكي (Smart Film &amp; Fanart Hub)</h2>
             <p class="text-xs text-slate-400">قلب على أي فيلم باش يجبد ليك البوستر، المخرج، والخلفيات ديال Fanart.tv أوتوماتيكياً</p>
@@ -178,7 +233,7 @@
 
         <!-- Hub Mode Tabs -->
         <div class="flex bg-black/50 p-1 rounded-xl border border-white/10 text-xs font-bold">
-          <button onclick="switchHubTab('search')" id="hubTab-search" class="px-3.5 py-1.5 rounded-lg bg-lb-blue text-black transition">
+          <button onclick="switchHubTab('search')" id="hubTab-search" class="px-3.5 py-1.5 rounded-lg bg-lx-teal text-black transition">
             🔍 بحث عالمي + Fanart
           </button>
           <button onclick="switchHubTab('rss')" id="hubTab-rss" class="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition">
@@ -194,9 +249,9 @@
       <div id="hubPanel-search" class="space-y-4">
         <div class="flex flex-col sm:flex-row gap-2.5">
           <div class="relative flex-1">
-            <input id="globalSearchInput" type="text" placeholder="كتب سمية الفيلم بـ الإنگليزية أو الفرنسية (مثلاً: Blade Runner 2049, Seven, Incendies)..." onkeydown="if(event.key==='Enter') runGlobalSearch()" class="w-full bg-black/50 border border-white/15 focus:border-lb-blue rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none">
+            <input id="globalSearchInput" type="text" placeholder="كتب سمية الفيلم بـ الإنگليزية أو الفرنسية (مثلاً: Blade Runner 2049, Seven, Incendies)..." onkeydown="if(event.key==='Enter') runGlobalSearch()" class="w-full bg-black/50 border border-white/15 focus:border-lx-teal rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none">
           </div>
-          <button onclick="runGlobalSearch()" id="searchBtn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-lb-blue to-cyan-400 hover:opacity-95 text-black font-black text-sm shrink-0 shadow-lg transition">
+          <button onclick="runGlobalSearch()" id="searchBtn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-lx-teal to-cyan-400 hover:opacity-95 text-black font-black text-sm shrink-0 shadow-lg transition">
             🔍 قلّب وجبد الخلفيات
           </button>
         </div>
@@ -208,8 +263,8 @@
       <!-- TAB B: Letterboxd RSS Sync -->
       <div id="hubPanel-rss" class="hidden space-y-4">
         <div class="flex flex-col sm:flex-row gap-2.5">
-          <input id="rssUsernameInput" type="text" placeholder="كتب الـ Username ديالك فـ Letterboxd (مثلاً: davidehrlich)..." onkeydown="if(event.key==='Enter') fetchLetterboxdRSS()" class="flex-1 bg-black/50 border border-white/15 focus:border-lb-orange rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none">
-          <button onclick="fetchLetterboxdRSS()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-lb-orange to-amber-500 text-black font-black text-sm shrink-0 shadow-lg">
+          <input id="rssUsernameInput" type="text" placeholder="كتب الـ Username ديالك فـ Letterboxd (مثلاً: davidehrlich)..." onkeydown="if(event.key==='Enter') fetchLetterboxdRSS()" class="flex-1 bg-black/50 border border-white/15 focus:border-lx-coral rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none">
+          <button onclick="fetchLetterboxdRSS()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-lx-coral to-lx-amber text-black font-black text-sm shrink-0 shadow-lg">
             🟠 جبد آخر أفلامي (Diary)
           </button>
         </div>
@@ -220,7 +275,7 @@
 
       <!-- TAB C: CSV Offline Import -->
       <div id="hubPanel-csv" class="hidden space-y-4">
-        <div class="border-2 border-dashed border-white/15 hover:border-lb-green/60 rounded-2xl p-6 text-center bg-black/30 transition">
+        <div class="border-2 border-dashed border-white/15 hover:border-lx-teal/60 rounded-2xl p-6 text-center bg-black/30 transition">
           <input type="file" id="csvFileInput" accept=".csv" multiple="" onchange="handleCSVUpload(event)" class="hidden">
           <label for="csvFileInput" class="cursor-pointer block space-y-2">
             <span class="text-3xl block">📂</span>
@@ -243,6 +298,11 @@
       </div>
     </section>
 
+    </div><!-- ═══ FIN PHASE 1 ═══ -->
+
+    <!-- ═══ PHASE 2 : التقييم (يغلف الـ Grid كامل: يسار=مراحل 2-3، يمين=مراحل 4-5) ═══ -->
+    <div class="wiz-panel hidden" data-step="2">
+
     <!-- MAIN WORKSPACE GRID (2 Columns on Desktop) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -253,7 +313,7 @@
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-5">
           <div class="flex items-center justify-between border-b border-white/10 pb-3">
             <div class="flex items-center gap-2.5">
-              <span class="w-8 h-8 rounded-xl bg-lb-green/15 border border-lb-green/30 flex items-center justify-center text-lb-green font-bold">2</span>
+              <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">2</span>
               <div>
                 <h2 class="text-base sm:text-lg font-extrabold text-white">التقييم وسياق المشاهدة (Rating &amp; Context)</h2>
                 <p class="text-xs text-slate-400">الاختيارات كتبدا محايدة (Neutral) باش ما يتأثرش البرومبت بشي حاجة ما ختاريتيهاش</p>
@@ -280,13 +340,13 @@
                 <span id="likeText">Liked (قليب فـ Letterboxd)</span>
               </button>
 
-              <select id="watchTypeSelect" class="bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-lb-green">
+              <select id="watchTypeSelect" class="bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-lx-teal">
                 <option value="">🎬 واش أول مرة شفتيه؟ (اختياري)</option>
                 <option value="First-time watch">أول مرة كنتفرج فيه (First Watch)</option>
                 <option value="Rewatch">معاودو (Rewatch 🔄)</option>
               </select>
 
-              <select id="expectationSelect" class="bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-lb-green">
+              <select id="expectationSelect" class="bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-lx-teal">
                 <option value="">🎯 كيف جاك مقارنة بالتوقعات؟ (اختياري)</option>
                 <option value="Exceeded all expectations">فاق التوقعات ديالي بزاف 🔥</option>
                 <option value="Met expectations">على قد التوقعات تماماً 👌</option>
@@ -298,11 +358,16 @@
           </div>
         </section>
 
+        </div><!-- ═══ FIN PHASE 2 ═══ -->
+
+        <!-- ═══ PHASE 3 : التحليل ═══ -->
+        <div class="wiz-panel hidden" data-step="3">
+
         <!-- 4. CINEMATIC ANALYSIS MATRIX (10 Elements with "No Opinion" Default) -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
             <div class="flex items-center gap-2.5">
-              <span class="w-8 h-8 rounded-xl bg-lb-orange/15 border border-lb-orange/30 flex items-center justify-center text-lb-orange font-bold">3</span>
+              <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">3</span>
               <div>
                 <h2 class="text-base sm:text-lg font-extrabold text-white">التحليل السينمائي المفصل (Cinematic Breakdown)</h2>
                 <p class="text-xs text-slate-400">قيّم غير العناصر اللي بغيتي تهضر عليها، وخلي الباقي "ما عنديش رأي"</p>
@@ -311,7 +376,7 @@
 
             <!-- Bulk Fill Presets -->
             <div class="flex items-center gap-1.5">
-              <button onclick="bulkSetElements('Masterclass 🔥')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-lb-green/15 text-lb-green border border-lb-green/30 hover:bg-lb-green/25">
+              <button onclick="bulkSetElements('Masterclass 🔥')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-lx-teal/15 text-lx-teal border border-lx-teal/30 hover:bg-lx-teal/25">
                 كلشي أسطوري 🔥
               </button>
               <button onclick="bulkSetElements('')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white/5 text-slate-400 border border-white/10 hover:text-white">
@@ -320,13 +385,13 @@
             </div>
           </div>
 
-          <div id="elementsMatrixContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">القصة والسيناريو (Story &amp; Script)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الإخراج والرؤية (Direction)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">التمثيل والأداء (Acting &amp; Cast)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">التصوير والإضاءة (Cinematography)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الإيقاع (Pacing — واش داز دغيا ولا ثقيل)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الموسيقى والصوت (Score &amp; Sound Design)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">المونتاج والتقطيع (Editing)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الحوارات (Dialogue)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الديكور والأجواء (Production Design &amp; Atmosphere)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">النهاية ديال الفيلم (The Ending)</label><select class="bg-lb-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lb-orange"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div></div>
+          <div id="elementsMatrixContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">القصة والسيناريو (Story &amp; Script)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الإخراج والرؤية (Direction)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">التمثيل والأداء (Acting &amp; Cast)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">التصوير والإضاءة (Cinematography)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الإيقاع (Pacing — واش داز دغيا ولا ثقيل)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الموسيقى والصوت (Score &amp; Sound Design)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">المونتاج والتقطيع (Editing)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الحوارات (Dialogue)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">الديكور والأجواء (Production Design &amp; Atmosphere)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div><div class="bg-black/40 border border-white/10 rounded-2xl p-3 flex flex-col gap-1.5"><label class="text-xs font-bold text-slate-200">النهاية ديال الفيلم (The Ending)</label><select class="bg-lx-surface border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-lx-coral"><option value="">— ما عنديش رأي / عادي —</option><option value="Masterclass 🔥">أسطوري واعر بزاف 🔥</option><option value="Strong &amp; Effective 👍">مزيان ومتقون 👍</option><option value="Mixed / Uneven ⚖️">بين وبين (متفاوت) ⚖️</option><option value="Weak / Underwhelming 👎">ضعيف وناقص 👎</option></select></div></div>
         </section>
 
         <!-- 5. VIBE TAGS & PERSONAL SOUL (What makes the review YOURS) -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-5">
           <div class="flex items-center gap-2.5 border-b border-white/10 pb-3">
-            <span class="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold">4</span>
+            <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black">4</span>
             <div>
               <h2 class="text-base sm:text-lg font-extrabold text-white">الـ Vibe واللمسة الشخصية ديالك (Personal Touch)</h2>
               <p class="text-xs text-slate-400">هاد التفاصيل هي اللي كتخلي المراجعة خارجة من قلبك وماشي ملخص ويكيبيديا</p>
@@ -343,7 +408,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
             <div>
               <label class="block text-xs font-bold text-emerald-300 mb-1">✨ أقوى نقطة أولا مشهد بقى فـ بالك:</label>
-              <textarea id="bestMomentInput" rows="2" placeholder="مثلاً: مشهد النهاية، أو الموسيقى فاش البطل كان كيجري، أو الحوار فـ الكافي..." class="w-full bg-black/50 border border-white/15 focus:border-lb-green rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+              <textarea id="bestMomentInput" rows="2" placeholder="مثلاً: مشهد النهاية، أو الموسيقى فاش البطل كان كيجري، أو الحوار فـ الكافي..." class="w-full bg-black/50 border border-white/15 focus:border-lx-teal rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
             </div>
             <div>
               <label class="block text-xs font-bold text-rose-300 mb-1">⚡ شي حاجة ما عجباتكش أو نقصات من الفيلم:</label>
@@ -353,24 +418,31 @@
 
           <div>
             <label class="block text-xs font-bold text-slate-200 mb-1">💭 فكرة حرة، تشبيه، أو إحساس بالدارجة أو الإنگليزية (الـ AI غادي يصيغو بأسلوبك):</label>
-            <textarea id="freeThoughtsInput" rows="2" placeholder="كتب أي فكرة جاتك على الفيلم واخا تكون غير مخربقة بالدارجة، وأنا غادي نرتبها فـ المراجعة بلا ما نخترع حتى معلومة من راسي..." class="w-full bg-black/50 border border-white/15 focus:border-lb-blue rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+            <textarea id="freeThoughtsInput" rows="2" placeholder="كتب أي فكرة جاتك على الفيلم واخا تكون غير مخربقة بالدارجة، وأنا غادي نرتبها فـ المراجعة بلا ما نخترع حتى معلومة من راسي..." class="w-full bg-black/50 border border-white/15 focus:border-lx-teal rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
           </div>
         </section>
+
+        </div><!-- ═══ FIN PHASE 3 ═══ -->
+
+        <!-- ═══ PHASE 4+5 panels live in the sticky right column below ═══ -->
 
       </div>
 
       <!-- LEFT COLUMN (5 Cols): Advanced Controls, Master Prompt, & Live AI Review Studio -->
       <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-20">
 
+        <div class="wiz-panel hidden" data-step="4">
+
         <!-- 6. ADVANCED REVIEW CONTROLS & PRESETS -->
         <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-white/10 pb-3">
             <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-lx-red/15 border border-lx-red/40 flex items-center justify-center text-red-300 font-black shrink-0">5</span>
               <span>🎛️</span>
               <span>إعدادات الأسلوب والنبرة (Style &amp; Sliders)</span>
             </h2>
             <!-- Quick Style Presets -->
-            <select id="stylePresetSelect" onchange="applyStylePreset(this.value)" class="bg-lb-surface border border-white/15 rounded-lg px-2.5 py-1 text-[11px] font-bold text-lb-green">
+            <select id="stylePresetSelect" onchange="applyStylePreset(this.value)" class="bg-lx-surface border border-white/15 rounded-lg px-2.5 py-1 text-[11px] font-bold text-lx-teal">
               <option value="balanced">⚡ Preset: متوازن وطبيعي</option>
               <option value="punchy">⚡ Preset: Letterboxd Witty One-Liner</option>
               <option value="cinephile">⚡ Preset: نقد سينمائي عميق</option>
@@ -422,32 +494,35 @@
           <div class="bg-black/40 rounded-2xl p-3.5 border border-white/10 space-y-2.5">
             <div class="flex items-center justify-between text-[11px]">
               <span class="text-slate-300 font-semibold">😂 مستوى الفكاهة والسخرية (Humor):</span>
-              <span id="humorVal" class="font-mono text-lb-orange">3/10</span>
+              <span id="humorVal" class="font-mono text-lx-coral">3/10</span>
             </div>
-            <input id="humorSlider" type="range" min="0" max="10" value="3" oninput="document.getElementById('humorVal').textContent=this.value+'/10'" class="w-full accent-lb-orange h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            <input id="humorSlider" type="range" min="0" max="10" value="3" oninput="document.getElementById('humorVal').textContent=this.value+'/10'" class="w-full accent-lx-coral h-1.5 bg-slate-800 rounded-lg cursor-pointer">
 
             <div class="flex items-center justify-between text-[11px] pt-1">
               <span class="text-slate-300 font-semibold">🧠 العمق الفلسفي والنقدي (Analytical Depth):</span>
-              <span id="depthVal" class="font-mono text-lb-blue">7/10</span>
+              <span id="depthVal" class="font-mono text-lx-teal">7/10</span>
             </div>
-            <input id="depthSlider" type="range" min="0" max="10" value="7" oninput="document.getElementById('depthVal').textContent=this.value+'/10'" class="w-full accent-lb-blue h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            <input id="depthSlider" type="range" min="0" max="10" value="7" oninput="document.getElementById('depthVal').textContent=this.value+'/10'" class="w-full accent-lx-teal h-1.5 bg-slate-800 rounded-lg cursor-pointer">
           </div>
 
           <!-- Guardrails Checkboxes -->
           <div class="flex flex-col gap-2 pt-1 text-xs">
             <label class="flex items-center gap-2 cursor-pointer text-slate-200">
-              <input id="antiAiToggle" type="checkbox" checked="" class="accent-lb-green w-4 h-4 rounded">
+              <input id="antiAiToggle" type="checkbox" checked="" class="accent-lx-teal w-4 h-4 rounded">
               <span>🛡️ <strong>Anti-Generic &amp; Anti-AI Filter:</strong> منع المقدمات المبتذلة والكلمات المصطنعة</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer text-slate-200">
-              <input id="strictFactToggle" type="checkbox" checked="" class="accent-lb-green w-4 h-4 rounded">
+              <input id="strictFactToggle" type="checkbox" checked="" class="accent-lx-teal w-4 h-4 rounded">
               <span>🔒 <strong>Fact Guard:</strong> منع اختراع أي مشهد أو رأي ما كتبتوش أنا</span>
             </label>
           </div>
         </section>
 
+        </div><!-- ═══ FIN PHASE 4 ═══ -->
+
+        <div class="wiz-panel hidden" data-step="5">
         <!-- 7. MASTER PROMPT & IN-APP AI REVIEW STUDIO -->
-        <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-2 border-t-lb-green">
+        <section class="cinema-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-2 border-t-lx-teal">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-base font-black text-white">🚀 توليد المراجعة أو نسخ البرومبت</h2>
@@ -460,12 +535,12 @@
 
           <!-- Primary Action Buttons -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button onclick="generatePromptAndCopy()" class="pill-btn py-3 px-4 rounded-xl bg-gradient-to-r from-lb-green to-emerald-400 text-black font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(0,224,84,0.3)] flex items-center justify-center gap-2">
+            <button onclick="generatePromptAndCopy()" class="pill-btn py-3 px-4 rounded-xl bg-gradient-to-r from-lx-amber to-orange-400 text-black font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(255,180,84,0.35)] flex items-center justify-center gap-2">
               <span>📋</span>
               <span>نسخ البرومبت الاحترافي (Copy Prompt)</span>
             </button>
 
-            <button onclick="generateReviewsInApp()" id="inAppGenBtn" class="pill-btn py-3 px-4 rounded-xl bg-gradient-to-r from-lb-blue to-indigo-400 text-black font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(64,188,244,0.25)] flex items-center justify-center gap-2">
+            <button onclick="generateReviewsInApp()" id="inAppGenBtn" class="pill-btn py-3 px-4 rounded-xl bg-gradient-to-r from-lx-teal to-sky-500 text-black font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(45,212,191,0.3)] flex items-center justify-center gap-2">
               <span>✨</span>
               <span>توليد 3 مراجعات وسط التطبيق</span>
             </button>
@@ -475,7 +550,7 @@
           <details class="group bg-black/50 rounded-2xl border border-white/10 overflow-hidden">
             <summary class="cursor-pointer px-4 py-2.5 text-xs font-bold text-slate-300 flex items-center justify-between hover:text-white">
               <span>👁️ معاينة الـ Master Prompt (مع بصمتك Writing DNA)</span>
-              <span class="text-[10px] font-mono text-lb-green group-open:rotate-180 transition">▼</span>
+              <span class="text-[10px] font-mono text-lx-teal group-open:rotate-180 transition">▼</span>
             </summary>
             <div class="p-3 border-t border-white/10">
               <textarea id="promptOutputArea" readonly="" rows="8" class="w-full bg-black/80 text-slate-200 font-mono text-[11px] p-3 rounded-xl border border-white/10 focus:outline-none"></textarea>
@@ -485,7 +560,7 @@
           <!-- IN-APP AI REVIEW VARIATIONS & REFINER -->
           <div id="aiStudioResultsArea" class="hidden space-y-4 pt-2 border-t border-white/10">
             <div class="flex items-center justify-between">
-              <h3 class="text-xs font-black uppercase tracking-wider text-lb-blue">✨ النسخ المقترحة (Compare &amp; Copy)</h3>
+              <h3 class="text-xs font-black uppercase tracking-wider text-lx-teal">✨ النسخ المقترحة (Compare &amp; Copy)</h3>
               <span id="aiGenStatus" class="text-[11px] text-slate-400"></span>
             </div>
 
@@ -507,7 +582,7 @@
 
           <!-- Local Journal / Saved Drafts Archive -->
           <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-            <button onclick="saveCurrentToJournal()" class="text-lb-orange hover:underline font-bold flex items-center gap-1">
+            <button onclick="saveCurrentToJournal()" class="text-lx-coral hover:underline font-bold flex items-center gap-1">
               <span>💾</span>
               <span>حفظ فـ الأرشيف ديالي (Save Draft)</span>
             </button>
@@ -517,8 +592,10 @@
           </div>
         </section>
 
-      </div>
-    </div>
+      </div><!-- ═══ FIN PHASE 5 ═══ -->
+    </div><!-- /lg:col-span-5 -->
+    </div><!-- /workspace grid -->
+    </div><!-- ═══ FIN PHASE 2 wrapper (phases 2→5) ═══ -->
   </main>
 <div id="apiModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="cinema-glass rounded-3xl max-w-xl w-full p-6 space-y-5 border border-white/20 max-h-[90vh] overflow-y-auto">
@@ -527,48 +604,48 @@
           <span class="text-2xl">🔑</span>
           <div>
             <h3 class="text-lg font-black text-white">إعدادات مفاتيح الـ API (API Keys Vault)</h3>
-            <p class="text-xs text-slate-400">حط السوارت ديالك هنا أولا وسط ملف <code class="text-lb-green font-mono">js/config.js</code> ملي تيليشارجي الدوسي!</p>
+            <p class="text-xs text-slate-400">حط السوارت ديالك هنا أولا وسط ملف <code class="text-lx-teal font-mono">js/config.js</code> ملي تيليشارجي الدوسي!</p>
           </div>
         </div>
         <button onclick="toggleModal('apiModal')" class="text-slate-400 hover:text-white text-xl font-bold">✕</button>
       </div>
 
       <div class="space-y-4 text-xs">
-        <div class="p-3 rounded-xl bg-lb-blue/10 border border-lb-blue/30 text-slate-200 leading-relaxed">
+        <div class="p-3 rounded-xl bg-lx-teal/10 border border-lx-teal/30 text-slate-200 leading-relaxed">
           💡 <strong>ملاحظة مهمة:</strong> التطبيق كيخدم <strong>حتى بلا هاد المفاتيح</strong> (عبر iTunes API + Wikidata + CORS Proxy)، ولكن إلا دخلتي مفتاح <strong>TMDB</strong> و <strong>Fanart.tv</strong> غتحصل على دقة 100% فـ الخلفيات الـ 4K والـ ClearLogos الشفافة!
         </div>
 
         <div>
           <label class="block font-bold text-white mb-1">1. مفتاح Fanart.tv API Key (خاص بالخلفيات والـ ClearLogos):</label>
           <input id="cfgFanartKey" type="password" placeholder="حط الـ Personal/Project API Key ديال Fanart.tv هنا..." class="w-full bg-black/60 border border-white/15 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-white font-mono">
-          <p class="text-[11px] text-slate-400 mt-1">كتجيبو بالمجان من: <a href="https://fanart.tv/get-an-api-key/" target="_blank" rel="noopener noreferrer" class="text-lb-blue underline">fanart.tv/get-an-api-key</a></p>
+          <p class="text-[11px] text-slate-400 mt-1">كتجيبو بالمجان من: <a href="https://fanart.tv/get-an-api-key/" target="_blank" rel="noopener noreferrer" class="text-lx-teal underline">fanart.tv/get-an-api-key</a></p>
         </div>
 
         <div>
           <label class="block font-bold text-white mb-1">2. مفتاح TMDB API Key (v3 Auth - للبحث، البوسترات، والـ TMDB ID):</label>
-          <input id="cfgTmdbKey" type="password" placeholder="حط الـ TMDB API Key ديالك هنا..." class="w-full bg-black/60 border border-white/15 focus:border-lb-green rounded-xl px-3.5 py-2.5 text-white font-mono">
-          <p class="text-[11px] text-slate-400 mt-1">كتجيبو بالمجان من: <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" class="text-lb-blue underline">themoviedb.org/settings/api</a></p>
+          <input id="cfgTmdbKey" type="password" placeholder="حط الـ TMDB API Key ديالك هنا..." class="w-full bg-black/60 border border-white/15 focus:border-lx-teal rounded-xl px-3.5 py-2.5 text-white font-mono">
+          <p class="text-[11px] text-slate-400 mt-1">كتجيبو بالمجان من: <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" class="text-lx-teal underline">themoviedb.org/settings/api</a></p>
         </div>
 
         <div>
           <label class="block font-bold text-white mb-1">3. مفتاح OMDb API Key (اختياري - لجلب IMDb ID وتقييمات Rotten Tomatoes):</label>
-          <input id="cfgOmdbKey" type="password" placeholder="مفتاح OMDb الاختياري..." class="w-full bg-black/60 border border-white/15 focus:border-lb-orange rounded-xl px-3.5 py-2.5 text-white font-mono">
+          <input id="cfgOmdbKey" type="password" placeholder="مفتاح OMDb الاختياري..." class="w-full bg-black/60 border border-white/15 focus:border-lx-coral rounded-xl px-3.5 py-2.5 text-white font-mono">
         </div>
 
         <div>
           <label class="block font-bold text-white mb-1">4. مفتاح Gemini API Key (اختياري - لتوليد المراجعات مباشرة وسط التطبيق):</label>
-          <input id="cfgGeminiKey" type="password" placeholder="AIzaSy... (يُحفظ فـ المتصفح ديالك فقط)" class="w-full bg-black/60 border border-white/15 focus:border-lb-blue rounded-xl px-3.5 py-2.5 text-white font-mono">
+          <input id="cfgGeminiKey" type="password" placeholder="AIzaSy... (يُحفظ فـ المتصفح ديالك فقط)" class="w-full bg-black/60 border border-white/15 focus:border-lx-teal rounded-xl px-3.5 py-2.5 text-white font-mono">
           <p class="text-[11px] text-slate-400 mt-1">إلا ما درتيهش، التطبيق غادي يخرج ليك 3 ديال القوالب الذكية واجدة للتعديل، وتقدر تنسخ البرومبت لأي شات AI مجاني!</p>
         </div>
 
         <div class="flex items-center justify-between pt-2">
           <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-            <input type="checkbox" onchange="togglePasswordVisibility(this.checked)" class="accent-lb-blue">
+            <input type="checkbox" onchange="togglePasswordVisibility(this.checked)" class="accent-lx-teal">
             <span>إظهار المفاتيح (Show Keys)</span>
           </label>
           <div class="flex gap-2">
             <button onclick="clearApiKeys()" class="px-3.5 py-2 rounded-xl bg-red-500/15 text-red-300 border border-red-500/30 font-bold">مسح المفاتيح</button>
-            <button onclick="saveApiKeysFromModal()" class="px-5 py-2 rounded-xl bg-lb-green text-black font-black">حفظ وتفعيل ✓</button>
+            <button onclick="saveApiKeysFromModal()" class="px-5 py-2 rounded-xl bg-lx-amber text-black font-black">حفظ وتفعيل ✓</button>
           </div>
         </div>
       </div>
@@ -625,7 +702,7 @@
       <div id="journalListContainer" class="space-y-2.5 text-xs"></div>
     </div>
   </div>
-<div id="toastBox" class="fixed bottom-5 left-5 z-50 px-5 py-3 rounded-2xl font-black text-xs shadow-2xl transition-all bg-lb-green text-black">📦 جاري تحضير دوسي المشروع الكامل (.ZIP)...</div>
+<div id="toastBox" class="fixed bottom-5 left-5 z-50 px-5 py-3 rounded-2xl font-black text-xs shadow-2xl transition-all bg-lx-teal text-black">📦 جاري تحضير دوسي المشروع الكامل (.ZIP)...</div>
 
   <!-- Clean Modular Scripts -->
   <script src="js/config.js"></script>
